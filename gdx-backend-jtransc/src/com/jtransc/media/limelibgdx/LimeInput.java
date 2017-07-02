@@ -12,9 +12,9 @@ public class LimeInput implements Input {
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
 
-	@HaxeMethodBody("" +
-		"{% if extra.debugLimeInput %} return {{ extra.debugLimeInput }}; {% end %}" +
-		"{% if !extra.debugLimeInput %} return false; {% end %}"
+	@HaxeMethodBody(
+		"{% if extra.debugLimeInput %} return {{ extra.debugLimeInput }};" +
+		"{% else %} return false; {% end %}"
 	)
 	private static boolean isLimeInputDebug() {
 		return false;
