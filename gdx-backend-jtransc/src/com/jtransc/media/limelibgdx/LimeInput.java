@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
 import com.jtransc.annotation.JTranscMethodBody;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,13 @@ public class LimeInput implements Input {
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
 
-	private static final boolean LIME_INPUT_DEBUG = false;
+	@HaxeMethodBody("" +
+		"{% if extra.debugLimeInput %} return {{ extra.debugLimeInput }}; {% end %}" +
+		"{% if !extra.debugLimeInput %} return false; {% end %}"
+	)
+	private static boolean isLimeInputDebug() {
+		return false;
+	}
 
 	static HashMap<Integer, Pointer> pointers = new HashMap<>();
 
@@ -43,7 +50,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseUp(double x, double y, int button) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
 		}
 		int localX = toLogicalX(x);
@@ -56,7 +63,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseDown(double x, double y, int button) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
 		}
 		int localX = toLogicalX(x);
@@ -87,7 +94,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onKeyUp(int keyCode, int modifier) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyUp(" + keyCode + "," + modifier + ")");
 		}
 		int key = convertKeyCode(keyCode);
@@ -98,7 +105,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onKeyDown(int keyCode, int modifier) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyDown(" + keyCode + "," + modifier + ")");
 		}
 		int key = convertKeyCode(keyCode);
@@ -109,7 +116,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onKeyTyped(char character) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyTyped(" + character + ")");
 		}
 		inputProcessor.keyTyped(character);
@@ -117,7 +124,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onTouchStart(int id, double x, double y) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchStart(" + id + "," + x + "," + y + ")");
 		}
 		// TODO: fix out of bounds on real device
@@ -135,7 +142,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onTouchMove(int id, double x, double y) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchMove(" + id + "," + x + "," + y + ")");
 		}
 		// TODO: fix out of bounds on real device
@@ -150,7 +157,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onTouchEnd(int id, double x, double y) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchEnd(" + id + "," + x + "," + y + ")");
 		}
 		// TODO: fix out of bounds on real device

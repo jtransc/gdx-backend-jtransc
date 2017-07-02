@@ -285,7 +285,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return LimeDevice.getType();
 	}
 
-	@HaxeMethodBody("" +
+	@HaxeMethodBody(
 		"{% if extra.showFPS %} return {{ extra.showFPS }}; {% end %}" +
 		"{% if !extra.showFPS %} return false; {% end %}"
 	)
