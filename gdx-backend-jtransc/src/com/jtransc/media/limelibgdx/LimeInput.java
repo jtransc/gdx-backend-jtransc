@@ -8,9 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LimeInput implements Input {
+
+	private static final int MAX_TOUCH_POINTS = 10;
+	private static final int MOUSE_KEY = -1;
+
 	private static boolean[] keys = new boolean[0x200];
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
+	private static boolean[] touchIndexes = new boolean[MAX_TOUCH_POINTS];
 
 	@HaxeMethodBody(
 		"{% if extra.debugLimeInput %} return {{ extra.debugLimeInput }};" +
@@ -25,7 +30,22 @@ public class LimeInput implements Input {
 	static private InputProcessor inputProcessor = new InputAdapter();
 
 	static {
-		pointers.put(0, new Pointer());
+		pointers.put(MOUSE_KEY, new Pointer());
+	}
+
+	private static int getIndex(){
+		for (int i  = 0; i < touchIndexes.length; i++){
+			if (!touchIndexes[i]) {
+				touchIndexes[i] = true;
+				return i;
+			}
+		}
+		return MAX_TOUCH_POINTS;
+	}
+
+	private static void releaseIndex(int index){
+		if (index > 0 && index < MAX_TOUCH_POINTS)
+			touchIndexes[index]	= false;
 	}
 
 	private static int toLogicalX(double realX) {
@@ -55,7 +75,7 @@ public class LimeInput implements Input {
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(0);
+		Pointer p = pointers.get(MOUSE_KEY);
 		p.setXY(localX, localY);
 		p.releaseButton(button);
 		inputProcessor.touchUp(localX, localY, 0, button);
@@ -68,7 +88,7 @@ public class LimeInput implements Input {
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(0);
+		Pointer p = pointers.get(MOUSE_KEY);
 		p.setXY(localX, localY);
 		p.pressButton(button);
 		inputProcessor.touchDown(localX, localY, 0, button);
@@ -78,7 +98,7 @@ public class LimeInput implements Input {
 	public static void lime_onMouseMove(double x, double y) {
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(0);
+		Pointer p = pointers.get(MOUSE_KEY);
 		p.setXY(localX, localY);
 		if (p.isPressingAnyButton()) {
 			inputProcessor.touchDragged(localX, localY, 0);
@@ -136,8 +156,9 @@ public class LimeInput implements Input {
 		Pointer p = new Pointer();
 		p.setXY(localX, localY);
 		p.pressButton(0);
+		p.setIndex(getIndex());
 		pointers.put(id, p);
-		inputProcessor.touchDown(localX, localY, id, 0);
+		inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
 	}
 
 	@SuppressWarnings("unused")
@@ -164,8 +185,9 @@ public class LimeInput implements Input {
 		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
 			return;
 		}
-		pointers.remove(id);
-		inputProcessor.touchUp(toLogicalX(x), toLogicalY(y), id, 0);
+		Pointer p = pointers.remove(id);
+		releaseIndex(p.getIndex());
+		inputProcessor.touchUp(toLogicalX(x), toLogicalY(y), p.getIndex(), 0);
 	}
 
 	@SuppressWarnings("unused")
@@ -526,6 +548,7 @@ public class LimeInput implements Input {
 		private double lastY;
 		private double currentX;
 		private double currentY;
+		private int index = -1;
 
 		public void setXY(double x, double y) {
 			this.currentX = x;
@@ -540,6 +563,13 @@ public class LimeInput implements Input {
 			this.lastX = currentX;
 			this.lastY = currentY;
 			this.lastB = currentB;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+		public void setIndex(int index) {
+			this.index = index;
 		}
 
 		public double getX() {
