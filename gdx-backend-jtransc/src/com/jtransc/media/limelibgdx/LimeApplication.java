@@ -245,6 +245,9 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@SuppressWarnings("unused")
 	public void render() {
+		if (!isAppCreated()) {
+			return;
+		}
 		super.render();
 		if (Gdx.gl instanceof GL20Ext) {
 			((GL20Ext)Gdx.gl).present();
