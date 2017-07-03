@@ -13,17 +13,12 @@ import com.jtransc.media.limelibgdx.logger.LoggerGL20;
 
 public class LimeGraphics implements Graphics {
 
-	public static final int defaultWidth = 640;
-	public static final int defaultHeight = 480;
-
 	final private GL20 gl;
 
 	private int frameId = 0;
 
-	private static int initWidth = defaultWidth;
-	private static int initHeight = defaultHeight;
-	private int currentWidth = defaultWidth;
-	private int currentHeight = defaultHeight;
+	private int currentWidth = LwjglApplicationConfiguration.defaultWidth;
+	private int currentHeight = LwjglApplicationConfiguration.defaultHeight;
 
 	public static class JtranscMonitor extends Monitor {
 		JtranscMonitor(int virtualX, int virtualY, String name) {
@@ -39,8 +34,8 @@ public class LimeGraphics implements Graphics {
 	private JtranscMode[] displayModes;
 
 	LimeGraphics(int width, int height, boolean trace) {
-		initWidth = currentWidth = width;
-		initHeight = currentHeight = height;
+		currentWidth = width;
+		currentHeight = height;
 		monitors = new Monitor[]{
 			new JtranscMonitor(width, height, "default")
 		};
@@ -275,8 +270,8 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@HaxeMethodBody(
-		"{% if fullscreen %} return {{ fullscreen }};" +
-		"{% else %} return false; {% end %}"
+		"{% if fullscreen %}return {{ fullscreen }};{% end %}" +
+		"{% if !fullscreen %}return false;{% end %}"
 	)
 	@Override
 	public boolean isFullscreen() {

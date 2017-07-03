@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
@@ -221,23 +222,23 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowWidth();")
 	@JTranscMethodBody(target = "js", value = "return window.innerWidth|0;")
 	static int getWindowWidth() {
-		return LimeGraphics.defaultWidth;
+		return LwjglApplicationConfiguration.defaultWidth;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowHeight();")
 	@JTranscMethodBody(target = "js", value = "return window.innerHeight|0;")
 	static int getWindowHeight() {
-		return LimeGraphics.defaultHeight;
+		return LwjglApplicationConfiguration.defaultHeight;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayWidth(0);")
 	static int getDisplayWidth() {
-		return LimeGraphics.defaultWidth;
+		return LwjglApplicationConfiguration.defaultWidth;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayHeight(0);")
 	static int getDisplayHeight() {
-		return LimeGraphics.defaultHeight;
+		return LwjglApplicationConfiguration.defaultHeight;
 	}
 
 	private boolean firstFrame = true;
@@ -286,8 +287,8 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@HaxeMethodBody(
-		"{% if extra.showFPS %} return {{ extra.showFPS }};" +
-		"{% else %} return false; {% end %}"
+		"{% if extra.showFPS %} return {{ extra.showFPS }}; {% end %}" +
+		"{% if !extra.showFPS %} return false; {% end %}"
 	)
 	private static boolean isShowFPS() {
 		return false;

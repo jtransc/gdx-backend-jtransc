@@ -13,15 +13,18 @@ public class LwjglApplicationConfiguration {
 	public int gles30ContextMajorVersion = 3;
 	public int gles30ContextMinorVersion = 2;
 
+	public static final int defaultWidth = 640;
+	public static final int defaultHeight = 480;
+
 	public int r = 8, g = 8, b = 8, a = 8;
 	public int depth = 16, stencil = 0;
 	public int samples = 0;
-	public int width = 640, height = 480;
+	public int width = defaultWidth, height = defaultHeight;
 	public int x = -1, y = -1;
 	public boolean fullscreen = false;
 	public int overrideDensity = -1;
 	public boolean vSyncEnabled = true;
-	public String title;
+	public String title = "";
 	public boolean forceExit = true;
 	public boolean resizable = true;
 	public int audioDeviceSimultaneousSources = 16;
@@ -68,17 +71,16 @@ public class LwjglApplicationConfiguration {
 	}
 
 	// TODO: review config and delete duplicate for LimeGraphics
-	@HaxeMethodBody("" +
-		"{% if extra.fps %} return {{ extra.fps }};" +
-		"{% else %} return 60;" +
-		"{% end %}"
+	@HaxeMethodBody(
+		"{% if extra.fps %}return {{ extra.fps }};{% end %}" +
+		"{% if !extra.fps %}return 60;{% end %}"
 	)
 	public static int getFramesPerSecond() {
 		return 60;
 	}
 
 	public static Graphics.DisplayMode getDesktopDisplayMode() {
-		return new LimeGraphics.JtranscMode(LimeGraphics.defaultWidth, LimeGraphics.defaultWidth, getFramesPerSecond(), 32);
+		return new LimeGraphics.JtranscMode(defaultWidth, defaultWidth, getFramesPerSecond(), 32);
 	}
 
 	public static Graphics.DisplayMode[] getDisplayModes() {
