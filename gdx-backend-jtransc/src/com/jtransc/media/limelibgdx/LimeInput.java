@@ -29,8 +29,12 @@ public class LimeInput implements Input {
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
-	static {
-		pointers.put(MOUSE_KEY, new Pointer());
+	private static boolean isMouseInitialized = false;
+	private static void initMouse() {
+		if (!isMouseInitialized) {
+			pointers.put(MOUSE_KEY, new Pointer());
+			isMouseInitialized = true;
+		}
 	}
 
 	private static int getIndex(){
@@ -77,6 +81,7 @@ public class LimeInput implements Input {
 		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
 			return;
 		}
+		initMouse();
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		Pointer p = pointers.get(MOUSE_KEY);
@@ -93,6 +98,7 @@ public class LimeInput implements Input {
 		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
 			return;
 		}
+		initMouse();
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		Pointer p = pointers.get(MOUSE_KEY);
@@ -106,6 +112,7 @@ public class LimeInput implements Input {
 		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
 			return;
 		}
+		initMouse();
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		Pointer p = pointers.get(MOUSE_KEY);
