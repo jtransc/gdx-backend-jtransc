@@ -12,8 +12,7 @@ typedef LimeInput = {% CLASS com.jtransc.media.limelibgdx.LimeInput %};
 class HaxeLimeGdxApplication extends lime.app.Application {
     static public var instance:HaxeLimeGdxApplication;
     static public var app:{% CLASS com.jtransc.media.limelibgdx.LimeApplication %};
-    static public var initializingListener:Bool = false;
-    static public var initializedListener:Bool = false;
+    static public var isInitialized:Bool = false;
 
     static private var DEBUG = false;
 
@@ -185,11 +184,16 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         //}
     }
 
+	var initializeCount:Byte = 3;
+	var initializeRenderCount:Byte = 3;
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
-        if (app != null) {
-            if (!initializingListener && preloadComplete) {
-                initializingListener = true;
+        if (initializeCount > 0) {
+        	initializeCount--;
+        	return;
+        }
+        if (app != null && preloadComplete) {
+            if (!isInitialized) {
                 switch (renderer.context) {
 					#if flash
 					case FLASH(sprite): HaxeLimeGdxApplication.sprite = sprite;
@@ -206,18 +210,19 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 
 					stage3D.addEventListener(flash.events.Event.CONTEXT3D_CREATE, function(e) {
                     	context3D = stage3D.context3D;
-						if (!initializedListener) {
 							app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
-							initializedListener = true;
 						}
 					});
                     stage3D.requestContext3D();
 				#else
 	                app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
-					initializedListener = true;
 				#end
-            }
-            if (initializedListener) {
+				isInitialized = true;
+            } else {
+            	if (initializeRenderCount > 0) {
+            		initializeRenderCount--;
+            		return;
+            	}
             	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}();
             }
         }
@@ -227,18 +232,27 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         super.update(deltaTime);
     }
 
-    private function isReady() return app != null && initializedListener;
+    private function isReady() return app != null && isInitialized;
 
     public override function onWindowActivate(window:Window):Void {
-        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
+    	super.onWindowActivate(window);
+        if (isReady()) {
+        	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
+        }
     }
 
     public override function onWindowDeactivate(window:Window):Void {
-        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
+        if (isReady()) {
+        	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
+        }
+        super.onWindowDeactivate(window);
     }
 
     public override function onWindowClose (window:Window):Void {
-        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
+        if (isReady()) {
+        	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
+        }
+        super.onWindowClose(window);
     }
 
     public function new() {
@@ -248,7 +262,10 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     }
 
 	public override function onWindowResize(window:Window, width:Int, height:Int):Void {
-		if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:resized:(II)V %}(width, height);
+		super.onWindowResize(window, width, height);
+		if (isReady()) {
+			app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:resized:(II)V %}(width, height);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////
