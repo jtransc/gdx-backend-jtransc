@@ -176,7 +176,7 @@ public class LimeInput implements Input {
 		int localY = (int)(Gdx.graphics.getHeight() * y);
 		Pointer p = pointers.get(id);
 		p.setXY(localX, localY);
-		inputProcessor.touchDragged(localX, localY, id);
+		inputProcessor.touchDragged(localX, localY, p.getIndex());
 	}
 
 	@SuppressWarnings("unused")
