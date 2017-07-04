@@ -25,7 +25,7 @@ public class LimeInput implements Input {
 		return false;
 	}
 
-	static HashMap<Integer, Pointer> pointers = new HashMap<>();
+	private static final HashMap<Integer, Pointer> pointers = new HashMap<>();
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
@@ -44,8 +44,9 @@ public class LimeInput implements Input {
 	}
 
 	private static void releaseIndex(int index){
-		if (index > 0 && index < MAX_TOUCH_POINTS)
-			touchIndexes[index]	= false;
+		if (index > 0 && index < MAX_TOUCH_POINTS) {
+			touchIndexes[index] = false;
+		}
 	}
 
 	private static int toLogicalX(double realX) {
@@ -73,6 +74,9 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
 		}
+		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+			return;
+		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		Pointer p = pointers.get(MOUSE_KEY);
@@ -86,6 +90,9 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
 		}
+		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+			return;
+		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		Pointer p = pointers.get(MOUSE_KEY);
@@ -96,6 +103,9 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseMove(double x, double y) {
+		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+			return;
+		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		Pointer p = pointers.get(MOUSE_KEY);
@@ -147,12 +157,8 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchStart(" + id + "," + x + "," + y + ")");
 		}
-		// TODO: fix out of bounds on real device
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
-			return;
-		}
-		int localX = toLogicalX(x);
-		int localY = toLogicalY(y);
+		int localX = (int)(Gdx.graphics.getWidth() * x);
+		int localY = (int)(Gdx.graphics.getHeight() * y);
 		Pointer p = new Pointer();
 		p.setXY(localX, localY);
 		p.pressButton(0);
@@ -166,13 +172,10 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchMove(" + id + "," + x + "," + y + ")");
 		}
-		// TODO: fix out of bounds on real device
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
-			return;
-		}
-		int localX = toLogicalX(x);
-		int localY = toLogicalY(y);
-		pointers.get(id).setXY(localX, localY);
+		int localX = (int)(Gdx.graphics.getWidth() * x);
+		int localY = (int)(Gdx.graphics.getHeight() * y);
+		Pointer p = pointers.get(id);
+		p.setXY(localX, localY);
 		inputProcessor.touchDragged(localX, localY, id);
 	}
 
@@ -181,13 +184,11 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchEnd(" + id + "," + x + "," + y + ")");
 		}
-		// TODO: fix out of bounds on real device
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
-			return;
-		}
+		int localX = (int)(Gdx.graphics.getWidth() * x);
+		int localY = (int)(Gdx.graphics.getHeight() * y);
 		Pointer p = pointers.remove(id);
 		releaseIndex(p.getIndex());
-		inputProcessor.touchUp(toLogicalX(x), toLogicalY(y), p.getIndex(), 0);
+		inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
 	}
 
 	@SuppressWarnings("unused")
