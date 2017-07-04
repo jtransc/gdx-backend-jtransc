@@ -10,7 +10,6 @@ import java.util.Map;
 public class LimeInput implements Input {
 
 	private static final int MAX_TOUCH_POINTS = 10;
-	private static final int MOUSE_KEY = -1;
 
 	private static boolean[] keys = new boolean[0x200];
 	private static boolean[] justPressed = new boolean[0x200];
@@ -26,16 +25,12 @@ public class LimeInput implements Input {
 	}
 
 	private static final HashMap<Integer, Pointer> pointers = new HashMap<>();
+	private static final Pointer mousePoint = new Pointer();
+	private static boolean lockMouse =
+		LimeDevice.getType() == Application.ApplicationType.iOS
+			|| LimeDevice.getType() == Application.ApplicationType.Android;
 
 	static private InputProcessor inputProcessor = new InputAdapter();
-
-	private static boolean isMouseInitialized = false;
-	private static void initMouse() {
-		if (!isMouseInitialized) {
-			pointers.put(MOUSE_KEY, new Pointer());
-			isMouseInitialized = true;
-		}
-	}
 
 	private static int getIndex(){
 		for (int i  = 0; i < touchIndexes.length; i++){
@@ -78,15 +73,13 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
 		}
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+		if (lockMouse) {
 			return;
 		}
-		initMouse();
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(MOUSE_KEY);
-		p.setXY(localX, localY);
-		p.releaseButton(button);
+		mousePoint.setXY(localX, localY);
+		mousePoint.releaseButton(button);
 		inputProcessor.touchUp(localX, localY, 0, button);
 	}
 
@@ -95,29 +88,25 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
 		}
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+		if (lockMouse) {
 			return;
 		}
-		initMouse();
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(MOUSE_KEY);
-		p.setXY(localX, localY);
-		p.pressButton(button);
+		mousePoint.setXY(localX, localY);
+		mousePoint.pressButton(button);
 		inputProcessor.touchDown(localX, localY, 0, button);
 	}
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseMove(double x, double y) {
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+		if (lockMouse) {
 			return;
 		}
-		initMouse();
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(MOUSE_KEY);
-		p.setXY(localX, localY);
-		if (p.isPressingAnyButton()) {
+		mousePoint.setXY(localX, localY);
+		if (mousePoint.isPressingAnyButton()) {
 			inputProcessor.touchDragged(localX, localY, 0);
 		} else {
 			inputProcessor.mouseMoved(localX, localY);
@@ -250,6 +239,9 @@ public class LimeInput implements Input {
 		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
 			entry.getValue().frame();
 		}
+		if (!lockMouse){
+			mousePoint.frame();
+		}
 	}
 
 	// @TODO: https://github.com/openfl/lime/blob/develop/lime/system/Sensor.hx
@@ -290,7 +282,10 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getX(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getX();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getX();
+		}
+		return (int) mousePoint.getX();
 	}
 
 	@Override
@@ -300,7 +295,10 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaX(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaX();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaX();
+		}
+		return (int) mousePoint.getDeltaX();
 	}
 
 	@Override
@@ -310,7 +308,10 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getY(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getY();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getY();
+		}
+		return (int) mousePoint.getY();
 	}
 
 	@Override
@@ -320,33 +321,47 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaY(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaY();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaY();
+		}
+		return (int) mousePoint.getDeltaY();
 	}
 
 	@Override
 	public boolean isTouched() {
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
-			if (entry.getValue().isPressingAnyButton()) return true;
+		if (lockMouse) {
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().isPressingAnyButton()) return true;
+			}
+		} else {
+			return mousePoint.isPressingAnyButton();
 		}
 		return false;
 	}
 
 	@Override
 	public boolean justTouched() {
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
-			if (entry.getValue().justPressedAnyButton()) return true;
+		if (lockMouse) {
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().justPressedAnyButton()) return true;
+			}
+		} else {
+			return mousePoint.justPressedAnyButton();
 		}
 		return false;
 	}
 
 	@Override
 	public boolean isTouched(int i) {
-		return pointers.get(i) != null && pointers.get(i).isPressingAnyButton();
+		if (lockMouse) {
+			return pointers.get(i) != null && pointers.get(i).isPressingAnyButton();
+		}
+		return mousePoint.isPressingAnyButton();
 	}
 
 	@Override
 	public boolean isButtonPressed(int i) {
-		return pointers.get(0).isPressingButton(i);
+		return mousePoint.isPressingButton(i);
 	}
 
 	@JTranscMethodBody(target = "js", value = "return p0;")
