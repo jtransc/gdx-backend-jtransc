@@ -1,4 +1,4 @@
-package com.jtransc.media.limelibgdx;
+package com.jtransc.media.limelibgdx.profiler;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -21,20 +21,20 @@ public class FrameRate implements Disposable{
 	private int frames = 0;
 	private int fps = 0;
 
-    FrameRate() {
+    public FrameRate() {
         font = new BitmapFont();
         batch = new SpriteBatch();
         cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    void resize(int screenWidth, int screenHeight) {
+    public void resize(int screenWidth, int screenHeight) {
         cam = new OrthographicCamera(screenWidth, screenHeight);
         cam.translate(screenWidth / 2, screenHeight / 2);
         cam.update();
         batch.setProjectionMatrix(cam.combined);
     }
 
-    void update() {
+    public void update() {
 		long time = System.nanoTime();
 
 		if (time - frameStart >= 1000000000) {
@@ -45,7 +45,7 @@ public class FrameRate implements Disposable{
 		frames++;
     }
 
-    void render() {
+    public void render() {
         batch.begin();
         font.draw(batch, fps + " fps", 3, Gdx.graphics.getHeight() - 3);
         batch.end();

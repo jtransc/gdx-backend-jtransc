@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.*;
 import com.jtransc.annotation.haxe.*;
+import com.jtransc.media.limelibgdx.profiler.FrameRate;
 
 import java.io.File;
 import java.io.IOException;

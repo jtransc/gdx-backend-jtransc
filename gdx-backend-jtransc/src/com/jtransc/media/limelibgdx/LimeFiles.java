@@ -2,47 +2,46 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.files.FileHandle;
-import com.jtransc.JTranscWrapped;
 import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscSyncIO;
+import com.jtransc.media.limelibgdx.profiler.ProfileTime;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 
 public class LimeFiles implements Files {
-	public LimeFiles() {
+	LimeFiles() {
 		JTranscSyncIO.impl = new JTranscSyncIOLimeImpl(JTranscSyncIO.impl);
 	}
 
 	@Override
 	public FileHandle getFileHandle(String s, FileType fileType) {
-		return new MyFileHandle(s);
+		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle classpath(String s) {
-		return new MyFileHandle(s);
+		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle internal(String s) {
-		return new MyFileHandle(s);
+		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle external(String s) {
-		return new MyFileHandle(s);
+		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle absolute(String s) {
-		return new MyFileHandle(s);
+		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle local(String s) {
-		return new MyFileHandle(s);
+		return new FileHandle(s);
 	}
 
 	@Override
@@ -65,13 +64,6 @@ public class LimeFiles implements Files {
 		return false;
 	}
 
-	static private class MyFileHandle extends FileHandle {
-		public MyFileHandle(String s) {
-			super(s);
-			System.out.println("MyFileHandle: " + s);
-		}
-	}
-
 	static public String fixpath(String path) {
 		while (path.startsWith("/")) path = path.substring(1);
 		if (!path.startsWith("assets") && !path.startsWith("/assets")) {
@@ -82,12 +74,14 @@ public class LimeFiles implements Files {
 	}
 
 	static private class JTranscSyncIOLimeImpl extends JTranscSyncIO.Impl {
-		public JTranscSyncIOLimeImpl(JTranscSyncIO.Impl parent) {
+		JTranscSyncIOLimeImpl(JTranscSyncIO.Impl parent) {
 			super(parent);
 		}
 
+		private static ProfileTime openTimeProfiler = new ProfileTime("OPEN_FILE");
 		@Override
 		public JTranscSyncIO.ImplStream open(String path, int mode) {
+			openTimeProfiler.start();
 			String pathFixed = fixpath(path);
 			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path + " in mode " + mode);
 			if (mode == JTranscSyncIO.O_RDWR) {
@@ -96,14 +90,14 @@ public class LimeFiles implements Files {
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
-			} else {
-				byte[] bytes = readBytes(pathFixed, mode);
-				if (bytes == null) {
-					System.out.println("Can't find: " + pathFixed);
-					throw new RuntimeException(new FileNotFoundException(path));
-				}
-				return new JTranscSyncIO.ByteStream(bytes);
 			}
+			byte[] bytes = readBytes(pathFixed, mode);
+			if (bytes == null) {
+				System.out.println("Can't find: " + pathFixed);
+				throw new RuntimeException(new FileNotFoundException(path));
+			}
+			openTimeProfiler.stop();
+			return new JTranscSyncIO.ByteStream(bytes);
 		}
 
 		@Override
@@ -121,10 +115,10 @@ public class LimeFiles implements Files {
 			return result;
 		}
 
-		static private final int BA_EXISTS    = 0x01;
-		static private final int BA_REGULAR   = 0x02;
-		static private final int BA_DIRECTORY = 0x04;
-		static private final int BA_HIDDEN    = 0x08;
+		private static final int BA_EXISTS    = 0x01;
+		private static final int BA_REGULAR   = 0x02;
+		private static final int BA_DIRECTORY = 0x04;
+		private static final int BA_HIDDEN    = 0x08;
 
 		@HaxeMethodBody("return lime.Assets.exists(p0._str);")
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.exists(N.istr(p0));")
