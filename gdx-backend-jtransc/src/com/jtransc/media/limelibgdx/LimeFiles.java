@@ -5,7 +5,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscSyncIO;
-import com.jtransc.media.limelibgdx.profiler.ProfileTime;
 
 import java.io.FileNotFoundException;
 
@@ -78,10 +77,8 @@ public class LimeFiles implements Files {
 			super(parent);
 		}
 
-		private static ProfileTime openTimeProfiler = new ProfileTime("OPEN_FILE");
 		@Override
 		public JTranscSyncIO.ImplStream open(String path, int mode) {
-			openTimeProfiler.start();
 			String pathFixed = fixpath(path);
 			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path + " in mode " + mode);
 			if (mode == JTranscSyncIO.O_RDWR) {
@@ -96,7 +93,6 @@ public class LimeFiles implements Files {
 				System.out.println("Can't find: " + pathFixed);
 				throw new RuntimeException(new FileNotFoundException(path));
 			}
-			openTimeProfiler.stop();
 			return new JTranscSyncIO.ByteStream(bytes);
 		}
 
