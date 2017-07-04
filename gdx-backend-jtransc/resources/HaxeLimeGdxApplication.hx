@@ -184,8 +184,8 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         //}
     }
 
-	var initializeCount:Byte = 3;
-	var initializeRenderCount:Byte = 3;
+	var initializeCount:Int = 3;
+	var initializeRenderCount:Int = 3;
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
         if (initializeCount > 0) {
