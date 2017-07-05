@@ -43,7 +43,7 @@ public class LimeInput implements Input {
 	}
 
 	private static void releaseIndex(int index){
-		if (index > 0 && index < MAX_TOUCH_POINTS) {
+		if (index >= 0 && index < MAX_TOUCH_POINTS) {
 			touchIndexes[index] = false;
 		}
 	}
