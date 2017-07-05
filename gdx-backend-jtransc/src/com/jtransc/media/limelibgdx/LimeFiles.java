@@ -9,6 +9,15 @@ import com.jtransc.io.JTranscSyncIO;
 import java.io.FileNotFoundException;
 
 public class LimeFiles implements Files {
+
+	@HaxeMethodBody(
+		"{% if extra.debugLimeFiles %}return {{ extra.debugLimeFiles }};{% end %}" +
+		"{% if !extra.debugLimeFiles %}return false;{% end %}"
+	)
+	private static boolean isLimeFilesDebug() {
+		return false;
+	}
+
 	LimeFiles() {
 		JTranscSyncIO.impl = new JTranscSyncIOLimeImpl(JTranscSyncIO.impl);
 	}
@@ -80,7 +89,9 @@ public class LimeFiles implements Files {
 		@Override
 		public JTranscSyncIO.ImplStream open(String path, int mode) {
 			String pathFixed = fixpath(path);
-			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path + " in mode " + mode);
+			if (isLimeFilesDebug()) {
+				System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path + " in mode " + mode);
+			}
 			if (mode == JTranscSyncIO.O_RDWR) {
 				try {
 					return super.open(path, mode);
@@ -104,7 +115,9 @@ public class LimeFiles implements Files {
 		@Override
 		public int getBooleanAttributes(String path) {
 			String pathFixed = fixpath(path);
-			System.out.println("JTranscSyncIOLimeImpl.getBooleanAttributes: " + pathFixed + " || " + path);
+			if (isLimeFilesDebug()) {
+				System.out.println("JTranscSyncIOLimeImpl.getBooleanAttributes: " + pathFixed + " || " + path);
+			}
 			int result = 0;
 			result |= BA_REGULAR;
 			if (exists(pathFixed)) result |= BA_EXISTS;
