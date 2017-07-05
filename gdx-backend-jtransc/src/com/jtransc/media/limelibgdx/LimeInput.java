@@ -70,11 +70,11 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseUp(double x, double y, int button) {
-		if (isLimeInputDebug()) {
-			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
-		}
 		if (lockMouse) {
 			return;
+		}
+		if (isLimeInputDebug()) {
+			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
@@ -85,11 +85,11 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseDown(double x, double y, int button) {
-		if (isLimeInputDebug()) {
-			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
-		}
 		if (lockMouse) {
 			return;
+		}
+		if (isLimeInputDebug()) {
+			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
@@ -102,6 +102,9 @@ public class LimeInput implements Input {
 	public static void lime_onMouseMove(double x, double y) {
 		if (lockMouse) {
 			return;
+		}
+		if (isLimeInputDebug()) {
+			System.out.println("lime_onMouseMove(" + x + "," + y + ")");
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
@@ -333,10 +336,9 @@ public class LimeInput implements Input {
 			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
 				if (entry.getValue().isPressingAnyButton()) return true;
 			}
-		} else {
-			return mousePoint.isPressingAnyButton();
+			return false;
 		}
-		return false;
+		return mousePoint.isPressingAnyButton();
 	}
 
 	@Override
@@ -345,10 +347,9 @@ public class LimeInput implements Input {
 			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
 				if (entry.getValue().justPressedAnyButton()) return true;
 			}
-		} else {
-			return mousePoint.justPressedAnyButton();
+			return false;
 		}
-		return false;
+		return mousePoint.justPressedAnyButton();
 	}
 
 	@Override
