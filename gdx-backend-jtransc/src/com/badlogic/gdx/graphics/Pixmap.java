@@ -16,6 +16,7 @@
 
 package com.badlogic.gdx.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap;
 import com.badlogic.gdx.utils.Disposable;
@@ -24,12 +25,10 @@ import com.jtransc.JTranscArrays;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
-import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
 import com.jtransc.media.limelibgdx.imaging.ImageDecoder;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -231,23 +230,13 @@ public class Pixmap implements Disposable {
 		this.actualHeight = this.height = bitmap.height;
 	}
 
-	@HaxeMethodBody(
-		"var image = lime.graphics.Image.fromFile(p0._str);\n" +
-		"var bytes = image.data.toBytes();\n" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(bytes.length, bytes);\n" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
-	)
 	private void loadImage(String path, boolean pixelPerfect) throws IOException {
 		if (!pixelPerfect && JTranscSystem.isPureJs()) {
 			loadImageNativeJs(path);
 		} else {
-			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(JTranscIoTools.readFile(new File(path)));
-			this.data = bitmap.data;
-			this.actualWidth = this.width = bitmap.width;
-			this.actualHeight = this.height = bitmap.height;
+			FileHandle fh = Gdx.files.internal(path);
+			byte[] compressedData = fh.readBytes();
+			loadImage(compressedData, 0, compressedData.length);
 		}
 	}
 
