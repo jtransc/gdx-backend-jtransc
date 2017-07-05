@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	<meta title="{{ title }}" package="{{ package }}" version="{{ version }}" company="{{ company }}" />
+	<meta title="*{{ title }}" if="debug" />
 	<app main="{{ entryPointClass }}" path="out" file="{{ name }}" />
 	<app swf-version="11.8" />
 
@@ -43,14 +44,14 @@
 	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
 	{% end %}
 
+	{% if hasIcon  %}
+	<icon path="{{ settings.icon }}" />
+	{% end %}
 	{% for androidIconPath in androidIcons %}
 	<icon path="{{ androidIconPath }}" if="android androidIcon"/>
 	{% end %}
 	{% for iosIconPath in iosIcons %}
 	<icon path="{{ iosIconPath }}" if="ios iosIcon"/>
-	{% end %}
-	{% if hasIcon  %}
-	<icon path="{{ settings.icon }}" unless="androidIcon || iosIcon" />
 	{% end %}
 
 	{% for splashScreen in splashScreens %}
