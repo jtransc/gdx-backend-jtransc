@@ -8,14 +8,13 @@
 	<window width="{{ initialWidth }}" height="{{ initialHeight }}" background="#FFFFFF" />
 	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="true" stencil-buffer="true" orientation="{{ orientation }}" allow-high-dpi="false" />
 	<window vsync="{{ vsync }}" antialiasing="4" if="cpp" />
-	<window fullscreen="true" width="0" height="0" if="mobile" />
-	<window fullscreen="false" if="js" />
-	<window fps="60" unless="js" />
-	{% if extra.fps %}
-	<window fps="{{ extra.fps }}" unless="js" />
-	{% end %}
-	<window fps="0" if="js" />
+	<window fullscreen="true" if="mobile" />
 	<window width="0" height="0" if="html5" />
+	<window fullscreen="false" if="js" />
+
+	<window fps="60" unless="js" />
+	{% if extra.fps %}<window fps="{{ extra.fps }}" unless="js" />{% end %}
+	<window fps="0" if="js" />
 
 	<setenv name="SHOW_CONSOLE" />
 
