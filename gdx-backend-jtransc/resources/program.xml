@@ -54,7 +54,8 @@
 	{% end %}
 
 	{% for splashScreen in splashScreens %}
-	<splashScreen path="{{ splashScreen }}" if="ios" />
+	{% set splashImage = image_properties(splashScreen) %}
+	<splashScreen path="{{ splashScreen }}" width="{{ splashImage.width }}" height="{{ splashImage.height }}" if="ios" />
 	{% end %}
 
 	{% if extra.deploymentVersion %}
