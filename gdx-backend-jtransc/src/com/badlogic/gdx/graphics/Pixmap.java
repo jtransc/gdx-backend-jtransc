@@ -360,7 +360,19 @@ public class Pixmap implements Disposable {
 	/**
 	 * Fills the complete bitmap with the currently set color.
 	 */
-	native public void fill();
+	public void fill() {
+		byte r = (byte) ((color & 0xFF000000) >> 24);
+		byte g = (byte) ((color & 0x00FF0000) >> 16);
+		byte b = (byte) ((color & 0x0000FF00) >> 8);
+		byte a = (byte) (color & 0x000000FF);
+
+		for (int i = 0; i < byteData.length; ) {
+			byteData[i++] = r;
+			byteData[i++] = g;
+			byteData[i++] = b;
+			byteData[i++] = a;
+		}
+	}
 
 // /**
 // * Sets the width in pixels of strokes.
@@ -419,11 +431,25 @@ public class Pixmap implements Disposable {
 	// copyPixels (sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, alphaImage:Image = null, alphaPoint:Vector2 = null, mergeAlpha:Bool = false):Void
 	public void drawPixmap(Pixmap pixmap, int x, int y, int srcx, int srcy, int srcWidth, int srcHeight) {
 		ensureLoaded();
-		for (int my = 0; my < srcHeight; my++) {
-			for (int mx = 0; mx < srcWidth; mx++) {
-				this._setPixel(x + mx, y + my, pixmap._getPixel(srcx + mx, srcy + my));
-			}
+		int byteWidth = width << 2;
+		int pixmapWidth = pixmap.width << 2;
+
+		int offset = y * byteWidth + (x << 2);
+		int srcOffset = srcy * pixmapWidth + (srcx << 2);
+
+		for(int i = 0; i < srcHeight; ++i) {
+			System.arraycopy(pixmap.byteData, srcOffset, byteData, offset, srcWidth << 2);
+			offset += byteWidth;
+			srcOffset += pixmapWidth;
 		}
+
+		//for (int my = 0; my < srcHeight; my++) {
+		//	for (int mx = 0; mx < srcWidth; mx++) {
+		//		this._setPixel(x + mx, y + my, pixmap._getPixel(srcx + mx, srcy + my));
+		//	}
+		//}
+
+		//for()
 	}
 
 	//private void copyPixels(sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, alphaImage:Image = null, alphaPoint:Vector2 = null, mergeAlpha:Bool = false):Void

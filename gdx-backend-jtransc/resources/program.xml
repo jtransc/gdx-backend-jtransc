@@ -30,7 +30,7 @@
 	{% end %}
 
 	<source path="src" />
-	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.ttf|*.fla|*.zip|*.swf" type="binary" />
+	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.fla|*.zip|*.swf" type="binary" />
 
 	{% if androidIcons != null %}
 	<define name="androidIcon" />

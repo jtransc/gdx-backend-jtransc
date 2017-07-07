@@ -4,4 +4,5 @@ include (
     'gdx-box2d-jtransc',
     'gdx-controllers-jtransc',
     'gdx-websockets-jtransc',
+	'gdx-freetype-jtransc',
 )
