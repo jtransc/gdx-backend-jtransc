@@ -270,8 +270,7 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@HaxeMethodBody(
-		"{% if fullscreen %}return {{ fullscreen }};{% end %}" +
-		"{% if !fullscreen %}return false;{% end %}"
+		"{% if fullscreen %}return {{ fullscreen }};{% else %}return false;{% end %}"
 	)
 	@Override
 	public boolean isFullscreen() {

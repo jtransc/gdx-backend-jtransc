@@ -17,8 +17,7 @@ public class LimeInput implements Input {
 	private static boolean[] touchIndexes = new boolean[MAX_TOUCH_POINTS];
 
 	@HaxeMethodBody(
-		"{% if extra.debugLimeInput %}return {{ extra.debugLimeInput }};{% end %}" +
-		"{% if !extra.debugLimeInput %}return false;{% end %}"
+		"{% if extra.debugLimeInput %}return {{ extra.debugLimeInput }};{% else %}return false;{% end %}"
 	)
 	private static boolean isLimeInputDebug() {
 		return false;
