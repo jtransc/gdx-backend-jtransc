@@ -78,9 +78,7 @@ public class FreeType {
 				"if(metrics.has_glyph_names) flags |= {% SFIELD com.badlogic.gdx.graphics.g2d.freetype.FreeType:FT_FACE_FLAG_GLYPH_NAMES %};" +
 				"return flags;"
 		)
-		public int getFaceFlags() {
-			throw new RuntimeException("FreeType.Face.getFaceFlags(): Not implemented.");
-		}
+		native public int getFaceFlags();
 
 		@HaxeMethodBody(
 			"var flags: Int = 0;" +
@@ -88,37 +86,27 @@ public class FreeType {
 				"if(metrics.is_bold) flags |= {% SFIELD com.badlogic.gdx.graphics.g2d.freetype.FreeType:FT_STYLE_FLAG_BOLD %};" +
 				"return flags;"
 		)
-		public int getStyleFlags() {
-			throw new RuntimeException("FreeType.Face.getStyleFlags(): Not implemented.");
-		}
+		native public int getStyleFlags();
 
 		@HaxeMethodBody(
 			"return font.numGlyphs;"
 		)
-		public int getNumGlyphs() {
-			throw new RuntimeException("FreeType.Face.getNumGlyphs(): Not implemented.");
-		}
+		native public int getNumGlyphs();
 
 		@HaxeMethodBody(
 			"return font.ascender;"
 		)
-		public int getAscender() {
-			throw new RuntimeException("FreeType.Face.getAscender(): Not implemented.");
-		}
+		native public int getAscender();
 
 		@HaxeMethodBody(
 			"return font.descender;"
 		)
-		public int getDescender() {
-			throw new RuntimeException("FreeType.Face.getDescender(): Not implemented.");
-		}
+		native public int getDescender();
 
 		@HaxeMethodBody(
 			"return font.height;"
 		)
-		public int getHeight() {
-			throw new RuntimeException("FreeType.Face.getHeight(): Not implemented.");
-		}
+		native public int getHeight();
 
 		@HaxeMethodBody(
 			"var maxAdvance: Int = 0;" +
@@ -127,51 +115,35 @@ public class FreeType {
 				"		maxAdvance = glyph.advance;" +
 				"return maxAdvance;"
 		)
-		public int getMaxAdvanceWidth() {
-			throw new RuntimeException("FreeType.Face.getMaxAdvanceWidth(): Not implemented.");
-		}
+		native public int getMaxAdvanceWidth();
 
 		@HaxeMethodBody(
 			"return font.height;"
 		)
-		public int getMaxAdvanceHeight() {
-			throw new RuntimeException("FreeType.Face.getMaxAdvanceHeight(): Not implemented.");
-		}
+		native public int getMaxAdvanceHeight();
 
 		@HaxeMethodBody(
 			"return font.underlinePosition;"
 		)
-		public int getUnderlinePosition() {
-			throw new RuntimeException("FreeType.Face.getUnderlinePosition(): Not implemented.");
-		}
+		native public int getUnderlinePosition();
 
 		@HaxeMethodBody(
 			"return font.underlineThickness;"
 		)
-		public int getUnderlineThickness() {
-			throw new RuntimeException("FreeType.Face.getUnderlineThickness(): Not implemented.");
-		}
+		native public int getUnderlineThickness();
 
-		public boolean selectSize(int strikeIndex) {
-			throw new RuntimeException("FreeType.Face.selectSize(): Not implemented.");
-		}
+		native public boolean selectSize(int strikeIndex);
 
-		public boolean setCharSize(int charWidth, int charHeight, int horzResolution, int vertResolution) {
-			throw new RuntimeException("FreeType.Face.setCharSize(): Not implemented.");
-		}
+		native public boolean setCharSize(int charWidth, int charHeight, int horzResolution, int vertResolution);
 
 		@HaxeMethodBody(
 			"pixelHeight = p1;" +
 				"metrics = NativeCFFI.lime_font_outline_decompose (font.src, pixelHeight * 64);" +
 				"return true;"
 		)
-		public boolean setPixelSizes(int pixelWidth, int pixelHeight) {
-			throw new RuntimeException("FreeType.Face.setPixelSizes(): Not implemented.");
-		}
+		native public boolean setPixelSizes(int pixelWidth, int pixelHeight);
 
-		public boolean loadGlyph(int glyphIndex, int loadFlags) {
-			throw new RuntimeException("FreeType.Face.loadGlyph(): Not implemented.");
-		}
+		native public boolean loadGlyph(int glyphIndex, int loadFlags);
 
 		@HaxeMethodBody(
 			"var str: String = CodePoint.fromInt(p0).toString();" +
@@ -182,9 +154,7 @@ public class FreeType {
 				"	Sys.println(\"Unsupport character: \"+p0);" +
 				"return glyph != -1;"
 		)
-		public boolean loadChar(int charCode, int loadFlags) {
-			throw new RuntimeException("FreeType.Face.loadChar(): Not implemented.");
-		}
+		native public boolean loadChar(int charCode, int loadFlags);
 
 		public GlyphSlot getGlyph() {
 			return new GlyphSlot(this);
@@ -197,9 +167,7 @@ public class FreeType {
 		@HaxeMethodBody(
 			"return metrics.has_kerning;"
 		)
-		public boolean hasKerning() {
-			throw new RuntimeException("FreeType.Face.hasKerning(): Not implemented.");
-		}
+		native public boolean hasKerning();
 
 		@HaxeMethodBody(
 			"for(kerning in metrics.kerning)" +
@@ -208,9 +176,7 @@ public class FreeType {
 				"	}" +
 				"return 0;"
 		)
-		public int getKerning(int leftGlyph, int rightGlyph, int kernMode) {
-			throw new RuntimeException("FreeType.Face.getKerning(): Not implemented.");
-		}
+		native public int getKerning(int leftGlyph, int rightGlyph, int kernMode);
 
 		@HaxeMethodBody(
 			"var index: Int = 0;" +
@@ -222,9 +188,7 @@ public class FreeType {
 				"}" +
 				"return 0;"
 		)
-		public int getCharIndex(int charCode) {
-			throw new RuntimeException("FreeType.Face.getCharIndex(): Not implemented.");
-		}
+		native public int getCharIndex(int charCode);
 
 		public void dispose() {
 		}
@@ -274,45 +238,31 @@ public class FreeType {
 		@HaxeMethodBody(
 			"return metrics.em_size;"
 		)
-		public int getXppem() {
-			throw new RuntimeException("FreeType.SizeMetrics.getXppem(): Not implemented.");
-		}
+		native public int getXppem();
 
 		@HaxeMethodBody(
 			"return metrics.em_size;"
 		)
-		public int getYppem() {
-			throw new RuntimeException("FreeType.SizeMetrics.getYppem(): Not implemented.");
-		}
+		native public int getYppem();
 
-		public int getXScale() {
-			throw new RuntimeException("FreeType.SizeMetrics.getXScale(): Not implemented.");
-		}
+		native public int getXScale();
 
-		public int getYscale() {
-			throw new RuntimeException("FreeType.SizeMetrics.getYscale(): Not implemented.");
-		}
+		native public int getYscale();
 
 		@HaxeMethodBody(
 			"return ascend;"
 		)
-		public int getAscender() {
-			throw new RuntimeException("FreeType.SizeMetrics.getAscender(): Not implemented.");
-		}
+		native public int getAscender();
 
 		@HaxeMethodBody(
 			"return ascend - height;"
 		)
-		public int getDescender() {
-			throw new RuntimeException("FreeType.SizeMetrics.getAscender(): Not implemented.");
-		}
+		native public int getDescender();
 
 		@HaxeMethodBody(
 			"return height;"
 		)
-		public int getHeight() {
-			throw new RuntimeException("FreeType.SizeMetrics.getHeight(): Not implemented.");
-		}
+		native public int getHeight();
 
 		public int getMaxAdvance() {
 			return face.getMaxAdvanceWidth();
@@ -334,37 +284,23 @@ public class FreeType {
 			return metrics;
 		}
 
-		public int getLinearHoriAdvance() {
-			throw new RuntimeException("FreeType.GlyphSlot.getLinearHoriAdvance(): Not implemented.");
-		}
+		native public int getLinearHoriAdvance();
 
-		public int getLinearVertAdvance() {
-			throw new RuntimeException("FreeType.GlyphSlot.getLinearVertAdvance(): Not implemented.");
-		}
+		native public int getLinearVertAdvance();
 
-		public int getAdvanceX() {
-			throw new RuntimeException("FreeType.GlyphSlot.getAdvanceX(): Not implemented.");
-		}
+		native public int getAdvanceX();
 
-		public int getAdvanceY() {
-			throw new RuntimeException("FreeType.GlyphSlot.getAdvanceY(): Not implemented.");
-		}
+		native public int getAdvanceY();
 
-		public int getFormat() {
-			throw new RuntimeException("FreeType.GlyphSlot.getFormat(): Not implemented.");
-		}
+		native public int getFormat();
 
 		public Bitmap getBitmap() {
 			return new Bitmap(face);
 		}
 
-		public int getBitmapLeft() {
-			throw new RuntimeException("FreeType.GlyphSlot.getBitmapLeft(): Not implemented.");
-		}
+		native public int getBitmapLeft();
 
-		public int getBitmapTop() {
-			throw new RuntimeException("FreeType.GlyphSlot.getBitmapTop(): Not implemented.");
-		}
+		native public int getBitmapTop();
 
 		public boolean renderGlyph(int renderMode) {
 			return true;
@@ -436,23 +372,17 @@ public class FreeType {
 		@HaxeMethodBody(
 			"return image != null ? image.height : 1;"
 		)
-		public int getRows() {
-			throw new RuntimeException("FreeType.Bitmap.getRows(): Not implemented.");
-		}
+		native public int getRows();
 
 		@HaxeMethodBody(
 			"return image != null ? image.width : 10;"
 		)
-		public int getWidth() {
-			throw new RuntimeException("FreeType.Bitmap.getWidth(): Not implemented.");
-		}
+		native public int getWidth();
 
 		@HaxeMethodBody(
 			"return image != null ? (image.buffer.width * image.buffer.bitsPerPixel) : 10;"
 		)
-		public int getPitch() {
-			throw new RuntimeException("FreeType.Bitmap.getPitch(): Not implemented.");
-		}
+		native public int getPitch();
 
 		public ByteBuffer getBuffer() {
 			return ByteBuffer.wrap(getData());
@@ -496,16 +426,12 @@ public class FreeType {
 		@HaxeMethodBody(
 			"return 0;"
 		)
-		public int getNumGray() {
-			throw new RuntimeException("FreeType.Bitmap.getNumGray(): Not implemented.");
-		}
+		native public int getNumGray();
 
 		@HaxeMethodBody(
 			"return 0;"
 		)
-		public int getPixelMode() {
-			throw new RuntimeException("FreeType.Bitmap.getPixelMode(): Not implemented.");
-		}
+		native public int getPixelMode();
 	}
 
 	@HaxeImports(
@@ -531,58 +457,42 @@ public class FreeType {
 		@HaxeMethodBody(
 			"return 0;"
 		)
-		public int getWidth() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getWidth(): Not implemented.");
-		}
+		native public int getWidth();
 
 		@HaxeMethodBody(
 			"return metrics.height;"
 		)
-		public int getHeight() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getHeight(): Not implemented.");
-		}
+		native public int getHeight();
 
 		@HaxeMethodBody(
 			"return Std.int(metrics.horizontalBearing.x);"
 		)
-		public int getHoriBearingX() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getHoriBearingX(): Not implemented.");
-		}
+		native public int getHoriBearingX();
 
 		@HaxeMethodBody(
 			"return Std.int(metrics.horizontalBearing.y);"
 		)
-		public int getHoriBearingY() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getHoriBearingY(): Not implemented.");
-		}
+		native public int getHoriBearingY();
 
 		@HaxeMethodBody(
 			"return Std.int(metrics.advance.x);"
 		)
-		public int getHoriAdvance() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getHoriAdvance(): Not implemented.");
-		}
+		native public int getHoriAdvance();
 
 		@HaxeMethodBody(
 			"return Std.int(metrics.advance.y);"
 		)
-		public int getVertAdvance() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getVertAdvance(): Not implemented.");
-		}
+		native public int getVertAdvance();
 
 		@HaxeMethodBody(
 			"return Std.int(metrics.verticalBearing.x);"
 		)
-		public int getVertBearingX() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getVertBearingX(): Not implemented.");
-		}
+		native public int getVertBearingX();
 
 		@HaxeMethodBody(
 			"return Std.int(metrics.verticalBearing.y);"
 		)
-		public int getVertBearingY() {
-			throw new RuntimeException("FreeType.GlyphMetrics.getVertBearingY(): Not implemented.");
-		}
+		native public int getVertBearingY();
 	}
 
 	public static class Stroker {
