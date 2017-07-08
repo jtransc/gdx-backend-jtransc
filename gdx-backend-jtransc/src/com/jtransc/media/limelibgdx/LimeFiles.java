@@ -11,8 +11,7 @@ import java.io.FileNotFoundException;
 public class LimeFiles implements Files {
 
 	@HaxeMethodBody(
-		"{% if extra.debugLimeFiles %}return {{ extra.debugLimeFiles }};{% end %}" +
-		"{% if !extra.debugLimeFiles %}return false;{% end %}"
+		"{% if extra.debugLimeFiles %}return {{ extra.debugLimeFiles }};{% else %}return false;{% end %}"
 	)
 	private static boolean isLimeFilesDebug() {
 		return false;

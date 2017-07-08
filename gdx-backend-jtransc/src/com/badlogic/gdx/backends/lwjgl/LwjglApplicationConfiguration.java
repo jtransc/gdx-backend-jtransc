@@ -72,8 +72,7 @@ public class LwjglApplicationConfiguration {
 
 	// TODO: review config and delete duplicate for LimeGraphics
 	@HaxeMethodBody(
-		"{% if extra.fps %}return {{ extra.fps }};{% end %}" +
-		"{% if !extra.fps %}return 60;{% end %}"
+		"{% if extra.fps %}return {{ extra.fps }};{% else %}return 60;{% end %}"
 	)
 	public static int getFramesPerSecond() {
 		return 60;

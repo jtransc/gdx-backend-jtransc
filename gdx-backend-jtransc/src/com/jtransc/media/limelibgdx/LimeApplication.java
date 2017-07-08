@@ -291,8 +291,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@HaxeMethodBody(
-		"{% if extra.showFPS %} return {{ extra.showFPS }}; {% end %}" +
-		"{% if !extra.showFPS %} return false; {% end %}"
+		"{% if extra.showFPS %}return {{ extra.showFPS }};{% else %}return false;{% end %}"
 	)
 	private static boolean isShowFPS() {
 		return false;
