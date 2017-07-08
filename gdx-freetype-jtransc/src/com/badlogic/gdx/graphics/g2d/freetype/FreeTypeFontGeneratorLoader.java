@@ -44,10 +44,13 @@ public class FreeTypeFontGeneratorLoader extends
 	@Override
 	public FreeTypeFontGenerator load(AssetManager assetManager, String fileName, FileHandle file,
 									  FreeTypeFontGeneratorParameters parameter) {
+		FreeTypeFontGenerator generator = null;
 		if (file.extension().equals("gen")) {
-			return new FreeTypeFontGenerator(file.sibling(file.nameWithoutExtension()));
+			generator = new FreeTypeFontGenerator(file.sibling(file.nameWithoutExtension()));
+		} else {
+			generator = new FreeTypeFontGenerator(file);
 		}
-		return new FreeTypeFontGenerator(file);
+		return generator;
 	}
 
 	@Override
@@ -55,6 +58,6 @@ public class FreeTypeFontGeneratorLoader extends
 		return null;
 	}
 
-	public static class FreeTypeFontGeneratorParameters extends AssetLoaderParameters<FreeTypeFontGenerator> {
+	static public class FreeTypeFontGeneratorParameters extends AssetLoaderParameters<FreeTypeFontGenerator> {
 	}
 }

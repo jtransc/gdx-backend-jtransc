@@ -16,14 +16,20 @@
 
 package com.badlogic.gdx.graphics.g2d.freetype;
 
+import java.awt.Stroke;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Blending;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.LongMap;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeImports;
 import com.jtransc.annotation.haxe.HaxeMeta;
@@ -219,6 +225,9 @@ public class FreeType {
 		public int getCharIndex(int charCode) {
 			throw new RuntimeException("FreeType.Face.getCharIndex(): Not implemented.");
 		}
+
+		public void dispose() {
+		}
 	}
 
 	public static class Size {
@@ -398,6 +407,9 @@ public class FreeType {
 
 		public int getTop() {
 			return toInt(slot.getMetrics().getHoriBearingY());
+		}
+
+		public void dispose() {
 		}
 	}
 
@@ -579,10 +591,9 @@ public class FreeType {
 
 		public void set(int radius, int lineCap, int lineJoin, int miterLimit) {
 		}
-	}
 
-	public static Stroker createStroker() {
-		return new Stroker();
+		public void dispose() {
+		}
 	}
 
 	public static Library initFreeType() {
@@ -612,6 +623,9 @@ public class FreeType {
 
 		public Stroker createStroker() {
 			return new Stroker();
+		}
+
+		public void dispose() {
 		}
 	}
 
@@ -643,7 +657,7 @@ public class FreeType {
 	public static int FT_ENCODING_OLD_LATIN_2 = encode('l', 'a', 't', '2');
 	public static int FT_ENCODING_APPLE_ROMAN = encode('a', 'r', 'm', 'n');
 
-	public static int FT_FACE_FLAG_SCALABLE = 1;
+	public static int FT_FACE_FLAG_SCALABLE = (1 << 0);
 	public static int FT_FACE_FLAG_FIXED_SIZES = (1 << 1);
 	public static int FT_FACE_FLAG_FIXED_WIDTH = (1 << 2);
 	public static int FT_FACE_FLAG_SFNT = (1 << 3);
@@ -658,7 +672,7 @@ public class FreeType {
 	public static int FT_FACE_FLAG_CID_KEYED = (1 << 12);
 	public static int FT_FACE_FLAG_TRICKY = (1 << 13);
 
-	public static int FT_STYLE_FLAG_ITALIC = 1;
+	public static int FT_STYLE_FLAG_ITALIC = (1 << 0);
 	public static int FT_STYLE_FLAG_BOLD = (1 << 1);
 
 	public static int FT_LOAD_DEFAULT = 0x0;

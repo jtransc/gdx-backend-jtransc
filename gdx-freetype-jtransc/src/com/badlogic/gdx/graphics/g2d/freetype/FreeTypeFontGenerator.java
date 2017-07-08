@@ -39,7 +39,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeType.Bitmap;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType.Face;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType.GlyphMetrics;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType.GlyphSlot;
-//import com.badlogic.gdx.graphics.g2d.freetype.FreeType.Library;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType.Library;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType.SizeMetrics;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType.Stroker;
 import com.badlogic.gdx.math.MathUtils;
@@ -70,7 +70,7 @@ import com.badlogic.gdx.utils.StreamUtils;
  * @author Rob Rendell
  */
 public class FreeTypeFontGenerator implements Disposable {
-	static public final String DEFAULT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$€-%+=#_&~*\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F\u00A0\u00A1\u00A2\u00A3\u00A4\u00A5\u00A6\u00A7\u00A8\u00A9\u00AA\u00AB\u00AC\u00AD\u00AE\u00AF\u00B0\u00B1\u00B2\u00B3\u00B4\u00B5\u00B6\u00B7\u00B8\u00B9\u00BA\u00BB\u00BC\u00BD\u00BE\u00BF\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5\u00C6\u00C7\u00C8\u00C9\u00CA\u00CB\u00CC\u00CD\u00CE\u00CF\u00D0\u00D1\u00D2\u00D3\u00D4\u00D5\u00D6\u00D7\u00D8\u00D9\u00DA\u00DB\u00DC\u00DD\u00DE\u00DF\u00E0\u00E1\u00E2\u00E3\u00E4\u00E5\u00E6\u00E7\u00E8\u00E9\u00EA\u00EB\u00EC\u00ED\u00EE\u00EF\u00F0\u00F1\u00F2\u00F3\u00F4\u00F5\u00F6\u00F7\u00F8\u00F9\u00FA\u00FB\u00FC\u00FD\u00FE\u00FF";
+	static public final String DEFAULT_CHARS = "\u0000ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$€-%+=#_&~*\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F\u00A0\u00A1\u00A2\u00A3\u00A4\u00A5\u00A6\u00A7\u00A8\u00A9\u00AA\u00AB\u00AC\u00AD\u00AE\u00AF\u00B0\u00B1\u00B2\u00B3\u00B4\u00B5\u00B6\u00B7\u00B8\u00B9\u00BA\u00BB\u00BC\u00BD\u00BE\u00BF\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5\u00C6\u00C7\u00C8\u00C9\u00CA\u00CB\u00CC\u00CD\u00CE\u00CF\u00D0\u00D1\u00D2\u00D3\u00D4\u00D5\u00D6\u00D7\u00D8\u00D9\u00DA\u00DB\u00DC\u00DD\u00DE\u00DF\u00E0\u00E1\u00E2\u00E3\u00E4\u00E5\u00E6\u00E7\u00E8\u00E9\u00EA\u00EB\u00EC\u00ED\u00EE\u00EF\u00F0\u00F1\u00F2\u00F3\u00F4\u00F5\u00F6\u00F7\u00F8\u00F9\u00FA\u00FB\u00FC\u00FD\u00FE\u00FF";
 
 	/**
 	 * A hint to scale the texture as needed, without capping it at any maximum size
@@ -85,9 +85,11 @@ public class FreeTypeFontGenerator implements Disposable {
 	 */
 	static private int maxTextureSize = 1024;
 
+	final Library library;
 	final Face face;
 	final String name;
 	boolean bitmapped = false;
+	private int pixelWidth, pixelHeight;
 
 	/**
 	 * Creates a new generator from the given font file. Uses {@link FileHandle#length()} to determine the file size. If the file
@@ -98,12 +100,15 @@ public class FreeTypeFontGenerator implements Disposable {
 		name = fontFile.pathWithoutExtension();
 		int fileSize = (int) fontFile.length();
 
+		library = FreeType.initFreeType();
+		if (library == null) throw new GdxRuntimeException("Couldn't initialize FreeType");
+
 		ByteBuffer buffer;
 		InputStream input = fontFile.read();
 		try {
 			if (fileSize == 0) {
 				// Copy to a byte[] to get the file size, then copy to the buffer.
-				byte[] data = StreamUtils.copyStreamToByteArray(input, 1024 * 16);
+				byte[] data = StreamUtils.copyStreamToByteArray(input, fileSize > 0 ? (int) (fileSize * 1.5f) : 1024 * 16);
 				buffer = BufferUtils.newUnsafeByteBuffer(data.length);
 				BufferUtils.copy(data, 0, buffer, data.length);
 			} else {
@@ -117,8 +122,10 @@ public class FreeTypeFontGenerator implements Disposable {
 			StreamUtils.closeQuietly(input);
 		}
 
-		face = Face.getFace(buffer);
+		face = library.newMemoryFace(buffer, 0);
+		if (face == null) throw new GdxRuntimeException("Couldn't create face for font: " + fontFile);
 
+//		if (checkForBitmapFont()) return;
 		setPixelSizes(0, 15);
 	}
 
@@ -302,6 +309,9 @@ public class FreeTypeFontGenerator implements Disposable {
 	}
 
 	void setPixelSizes(int pixelWidth, int pixelHeight) {
+//		this.pixelWidth = pixelWidth;
+//		this.pixelHeight = pixelHeight;
+//		if (!bitmapped && !face.setPixelSizes(pixelWidth, pixelHeight)) throw new GdxRuntimeException("Couldn't set size for font");
 		face.setPixelSizes(pixelWidth, pixelHeight);
 	}
 
@@ -322,14 +332,14 @@ public class FreeTypeFontGenerator implements Disposable {
 		// set general font data
 		SizeMetrics fontMetrics = face.getSize().getMetrics();
 		data.flipped = parameter.flip;
-		data.ascent = FreeType.toInt(fontMetrics.getAscender()); // Font.ascender
-		data.descent = FreeType.toInt(fontMetrics.getDescender()); // Font.descender
-		data.lineHeight = FreeType.toInt(fontMetrics.getHeight()); // Font.height
+		data.ascent = FreeType.toInt(fontMetrics.getAscender());
+		data.descent = FreeType.toInt(fontMetrics.getDescender());
+		data.lineHeight = FreeType.toInt(fontMetrics.getHeight());
 		float baseLine = data.ascent;
 
 		// if bitmapped
 		if (bitmapped && (data.lineHeight == 0)) {
-			for (int c = 32; c < (32 + face.getNumGlyphs()); c++) { // Font.numGlyphs
+			for (int c = 32; c < (32 + face.getNumGlyphs()); c++) {
 				if (loadChar(c, flags)) {
 					int lh = FreeType.toInt(face.getGlyph().getMetrics().getHeight());
 					data.lineHeight = (lh > data.lineHeight) ? lh : data.lineHeight;
@@ -399,7 +409,7 @@ public class FreeTypeFontGenerator implements Disposable {
 
 		Stroker stroker = null;
 		if (parameter.borderWidth > 0) {
-			stroker = FreeType.createStroker();
+			stroker = library.createStroker();
 			stroker.set((int) (parameter.borderWidth * 64f),
 				parameter.borderStraight ? FreeType.FT_STROKER_LINECAP_BUTT : FreeType.FT_STROKER_LINECAP_ROUND,
 				parameter.borderStraight ? FreeType.FT_STROKER_LINEJOIN_MITER_FIXED : FreeType.FT_STROKER_LINEJOIN_ROUND, 0);
@@ -441,6 +451,8 @@ public class FreeTypeFontGenerator implements Disposable {
 			characters[best] = characters[heightsCount];
 			characters[heightsCount] = tmpChar;
 		}
+
+		if (stroker != null && !incremental) stroker.dispose();
 
 		if (incremental) {
 			data.generator = this;
@@ -497,13 +509,25 @@ public class FreeTypeFontGenerator implements Disposable {
 	Glyph createGlyph(char c, FreeTypeBitmapFontData data, FreeTypeFontParameter parameter, Stroker stroker, float baseLine,
 					  PixmapPacker packer) {
 
+		//int charIndex = face.getCharIndex(c);
+		//boolean missing = charIndex == 0 && c != 0;
+		//System.out.println("createGlyph() c='"+c+"' charIndex="+charIndex);
+		//if (missing) return null;
+
 		if (!loadChar(c, getLoadingFlags(parameter))) return null;
-		System.out.println("createGlyph() c='" + c + "'");
+
 		GlyphSlot slot = face.getGlyph();
 		FreeType.Glyph mainGlyph = slot.getGlyph();
-		mainGlyph.toBitmap(parameter.mono ? FreeType.FT_RENDER_MODE_MONO : FreeType.FT_RENDER_MODE_NORMAL);
+		try {
+			mainGlyph.toBitmap(parameter.mono ? FreeType.FT_RENDER_MODE_MONO : FreeType.FT_RENDER_MODE_NORMAL);
+		} catch (GdxRuntimeException e) {
+			mainGlyph.dispose();
+			Gdx.app.log("FreeTypeFontGenerator", "Couldn't render char: " + c);
+			return null;
+		}
 		Bitmap mainBitmap = mainGlyph.getBitmap();
 		Pixmap mainPixmap = mainBitmap.getPixmap(Format.RGBA8888, parameter.color, parameter.gamma);
+
 		if (mainBitmap.getWidth() != 0 && mainBitmap.getRows() != 0) {
 			int offsetX = 0, offsetY = 0;
 			if (parameter.borderWidth > 0) {
@@ -524,6 +548,7 @@ public class FreeTypeFontGenerator implements Disposable {
 					borderPixmap.drawPixmap(mainPixmap, offsetX, offsetY);
 
 				mainPixmap.dispose();
+				mainGlyph.dispose();
 				mainPixmap = borderPixmap;
 				mainGlyph = borderGlyph;
 			}
@@ -589,6 +614,7 @@ public class FreeTypeFontGenerator implements Disposable {
 					mainPixmap.drawPixel(w, h, ((bit == 1) ? whiteIntBits : clearIntBits));
 				}
 			}
+
 		}
 
 		Rectangle rect = packer.pack(mainPixmap);
@@ -601,6 +627,8 @@ public class FreeTypeFontGenerator implements Disposable {
 			packer.updateTextureRegions(data.regions, parameter.minFilter, parameter.magFilter, parameter.genMipMaps);
 
 		mainPixmap.dispose();
+		mainGlyph.dispose();
+
 		return glyph;
 	}
 
@@ -609,6 +637,8 @@ public class FreeTypeFontGenerator implements Disposable {
 	 */
 	@Override
 	public void dispose() {
+		face.dispose();
+		library.dispose();
 	}
 
 	/**
@@ -700,6 +730,7 @@ public class FreeTypeFontGenerator implements Disposable {
 
 		@Override
 		public void dispose() {
+			if (stroker != null) stroker.dispose();
 			if (packer != null) packer.dispose();
 		}
 	}
