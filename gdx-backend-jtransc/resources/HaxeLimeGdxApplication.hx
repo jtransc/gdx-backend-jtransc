@@ -363,6 +363,9 @@ class JTranscModule extends lime.app.Module {
     override public function onMouseMove (window:Window, x:Float, y:Float):Void {
     	LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseMove %}(x, y);
     }
+	override public function onMouseWheel (window:Window, x:Float, y:Float):Void {
+		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onWheel %}(x, y, 0);
+	}
 
 
 	override public function onKeyDown(window:Window, keyCode:KeyCode, modifier:lime.ui.KeyModifier):Void {

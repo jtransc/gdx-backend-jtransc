@@ -117,7 +117,10 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onWheel(double x, double y, double z) {
-		inputProcessor.scrolled(toLogicalY(y));
+		if (isLimeInputDebug()) {
+			System.out.println("lime_onWheel(" + x + ", " + y + ", " + z + ")");
+		}
+		inputProcessor.scrolled((int) y);
 	}
 
 	@SuppressWarnings("unused")
