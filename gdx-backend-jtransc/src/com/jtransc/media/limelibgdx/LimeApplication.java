@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.*;
 import com.jtransc.annotation.haxe.*;
-import com.jtransc.media.limelibgdx.profiler.FrameRate;
+import com.jtransc.media.limelibgdx.profiler.DebugInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -255,14 +255,14 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		}
 		if (firstFrame) {
 			firstFrame = false;
-			if (isShowFPS()) {
-				frameRate = new FrameRate();
+			if (DebugInfo.isShowDebugInfo()) {
+				debugInfo = new DebugInfo();
 			}
 			show();
 		}
-		if (isShowFPS()) {
-			frameRate.update();
-			frameRate.render();
+		if (DebugInfo.isShowDebugInfo()) {
+			debugInfo.update();
+			debugInfo.render();
 		}
 		LimeInput.lime_frame();
 	}
@@ -280,8 +280,8 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@Override
 	public void onDisposed() {
 		super.onDisposed();
-		if (isShowFPS()) {
-			frameRate.dispose();
+		if (DebugInfo.isShowDebugInfo()) {
+			debugInfo.dispose();
 		}
 	}
 
@@ -290,11 +290,5 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return LimeDevice.getType();
 	}
 
-	@HaxeMethodBody(
-		"{% if extra.showFPS %}return {{ extra.showFPS }};{% else %}return false;{% end %}"
-	)
-	private static boolean isShowFPS() {
-		return false;
-	}
-	private FrameRate frameRate;
+	private DebugInfo debugInfo;
 }
