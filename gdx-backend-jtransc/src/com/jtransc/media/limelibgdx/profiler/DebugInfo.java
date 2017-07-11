@@ -88,17 +88,18 @@ public class DebugInfo implements Disposable {
 			debugInfo.add("Memory info:");
 
 			gc();
+			debugInfo.add("free: " + (Runtime.getRuntime().freeMemory() >> 20) + " MB");
 			if ((memInfoFlags & SHOW_MEM_INFO_USAGE) != 0) {
-				debugInfo.add("usage: " + (memInfo((SHOW_MEM_INFO_USAGE >> 1) - 1) >> 10) + " KB");
+				debugInfo.add("usage: " + (memInfo((SHOW_MEM_INFO_USAGE >> 1) - 1) >> 20) + " MB");
 			}
 			if ((memInfoFlags & SHOW_MEM_INFO_CURRENT) != 0) {
-				debugInfo.add("current: " + (memInfo((SHOW_MEM_INFO_CURRENT >> 1) - 1) >> 10) + " KB");
+				debugInfo.add("current: " + (memInfo((SHOW_MEM_INFO_CURRENT >> 1) - 1) >> 20) + " MB");
 			}
 			if ((memInfoFlags & SHOW_MEM_INFO_RESERVED) != 0) {
-				debugInfo.add("reserved: " + (memInfo((SHOW_MEM_INFO_RESERVED >> 1) - 1) >> 10) + " KB");
+				debugInfo.add("reserved: " + (memInfo((SHOW_MEM_INFO_RESERVED >> 1) - 1) >> 20) + " MB");
 			}
 			if ((memInfoFlags & SHOW_MEM_INFO_LARGE) != 0) {
-				debugInfo.add("large: " + (memInfo((SHOW_MEM_INFO_LARGE >> 1) - 1) >> 10) + " KB");
+				debugInfo.add("large: " + (memInfo((SHOW_MEM_INFO_LARGE >> 1) - 1) >> 20) + " MB");
 			}
 		}
 	}
