@@ -448,10 +448,8 @@ public class LimeInput implements Input {
 	}
 
 	private boolean checkKeyArray(boolean[] array, int i) {
-		if (i < 0) {
-			return array.length > 0 && array[0];
-		}
-		return i < array.length && array[i];
+		final int actualIndex = (i < 0) ? 0 : i;
+		return actualIndex < array.length && array[actualIndex];
 	}
 
 	@Override
