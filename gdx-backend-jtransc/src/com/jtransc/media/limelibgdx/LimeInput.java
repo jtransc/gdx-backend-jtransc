@@ -288,9 +288,12 @@ public class LimeInput implements Input {
 	@Override
 	public int getX(int i) {
 		if (lockMouse) {
-			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getX();
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().getIndex() == i) return (int) entry.getValue().getX();
+			}
+			return 0;
 		}
-		return (int) mousePoint.getX();
+		return i == 0 ? (int) mousePoint.getX() : 0;
 	}
 
 	@Override
@@ -301,9 +304,12 @@ public class LimeInput implements Input {
 	@Override
 	public int getDeltaX(int i) {
 		if (lockMouse) {
-			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaX();
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().getIndex() == i) return (int) entry.getValue().getDeltaX();
+			}
+			return 0;
 		}
-		return (int) mousePoint.getDeltaX();
+		return i == 0 ? (int) mousePoint.getDeltaX() : 0;
 	}
 
 	@Override
@@ -314,9 +320,12 @@ public class LimeInput implements Input {
 	@Override
 	public int getY(int i) {
 		if (lockMouse) {
-			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getY();
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().getIndex() == i) return (int) entry.getValue().getY();
+			}
+			return 0;
 		}
-		return (int) mousePoint.getY();
+		return i == 0 ? (int) mousePoint.getY() : 0;
 	}
 
 	@Override
@@ -327,9 +336,12 @@ public class LimeInput implements Input {
 	@Override
 	public int getDeltaY(int i) {
 		if (lockMouse) {
-			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaY();
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().getIndex() == i) return (int) entry.getValue().getDeltaY();
+			}
+			return 0;
 		}
-		return (int) mousePoint.getDeltaY();
+		return i == 0 ? (int) mousePoint.getDeltaY() : 0;
 	}
 
 	@Override
@@ -357,9 +369,12 @@ public class LimeInput implements Input {
 	@Override
 	public boolean isTouched(int i) {
 		if (lockMouse) {
-			return pointers.get(i) != null && pointers.get(i).isPressingAnyButton();
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().getIndex() == i) return pointers.get(i).isPressingAnyButton();
+			}
+			return false;
 		}
-		return mousePoint.isPressingAnyButton();
+		return i == 0 && mousePoint.isPressingAnyButton();
 	}
 
 	@Override
