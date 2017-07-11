@@ -31,8 +31,8 @@ public class LimeInput implements Input {
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
-	private static int getIndex(){
-		for (int i  = 0; i < touchIndexes.length; i++){
+	private static int getIndex() {
+		for (int i = 0; i < touchIndexes.length; i++) {
 			if (!touchIndexes[i]) {
 				touchIndexes[i] = true;
 				return i;
@@ -41,7 +41,7 @@ public class LimeInput implements Input {
 		return MAX_TOUCH_POINTS;
 	}
 
-	private static void releaseIndex(int index){
+	private static void releaseIndex(int index) {
 		if (index >= 0 && index < MAX_TOUCH_POINTS) {
 			touchIndexes[index] = false;
 		}
@@ -67,8 +67,7 @@ public class LimeInput implements Input {
 		return (int) (realY * (Gdx.graphics.getHeight() / realHeight));
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onMouseUp(double x, double y, int button) {
+	static void lime_onMouseUp(double x, double y, int button) {
 		if (lockMouse) {
 			return;
 		}
@@ -82,8 +81,7 @@ public class LimeInput implements Input {
 		inputProcessor.touchUp(localX, localY, 0, button);
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onMouseDown(double x, double y, int button) {
+	static void lime_onMouseDown(double x, double y, int button) {
 		if (lockMouse) {
 			return;
 		}
@@ -97,8 +95,7 @@ public class LimeInput implements Input {
 		inputProcessor.touchDown(localX, localY, 0, button);
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onMouseMove(double x, double y) {
+	static void lime_onMouseMove(double x, double y) {
 		if (lockMouse) {
 			return;
 		}
@@ -116,15 +113,14 @@ public class LimeInput implements Input {
 	}
 
 	@SuppressWarnings("unused")
-	static public void lime_onWheel(double x, double y, double z) {
+	static void lime_onWheel(double x, double y, double z) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onWheel(" + x + ", " + y + ", " + z + ")");
 		}
 		inputProcessor.scrolled((int) y);
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onKeyUp(int keyCode, int modifier) {
+	static void lime_onKeyUp(int keyCode, int modifier) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyUp(" + keyCode + "," + modifier + ")");
 		}
@@ -134,8 +130,7 @@ public class LimeInput implements Input {
 		inputProcessor.keyUp(key);
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onKeyDown(int keyCode, int modifier) {
+	static void lime_onKeyDown(int keyCode, int modifier) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyDown(" + keyCode + "," + modifier + ")");
 		}
@@ -145,21 +140,19 @@ public class LimeInput implements Input {
 		inputProcessor.keyDown(key);
 	}
 
-	@SuppressWarnings("unused")
-	static public void lime_onKeyTyped(char character) {
+	private static void lime_onKeyTyped(char character) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyTyped(" + character + ")");
 		}
 		inputProcessor.keyTyped(character);
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onTouchStart(int id, double x, double y) {
+	static void lime_onTouchStart(int id, double x, double y) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchStart(" + id + "," + x + "," + y + ")");
 		}
-		int localX = (int)(Gdx.graphics.getWidth() * x);
-		int localY = (int)(Gdx.graphics.getHeight() * y);
+		int localX = (int) (Gdx.graphics.getWidth() * x);
+		int localY = (int) (Gdx.graphics.getHeight() * y);
 		Pointer p = new Pointer();
 		p.setXY(localX, localY);
 		p.pressButton(0);
@@ -168,25 +161,23 @@ public class LimeInput implements Input {
 		inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onTouchMove(int id, double x, double y) {
+	static void lime_onTouchMove(int id, double x, double y) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchMove(" + id + "," + x + "," + y + ")");
 		}
-		int localX = (int)(Gdx.graphics.getWidth() * x);
-		int localY = (int)(Gdx.graphics.getHeight() * y);
+		int localX = (int) (Gdx.graphics.getWidth() * x);
+		int localY = (int) (Gdx.graphics.getHeight() * y);
 		Pointer p = pointers.get(id);
 		p.setXY(localX, localY);
 		inputProcessor.touchDragged(localX, localY, p.getIndex());
 	}
 
-	@SuppressWarnings("unused")
-	public static void lime_onTouchEnd(int id, double x, double y) {
+	static void lime_onTouchEnd(int id, double x, double y) {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchEnd(" + id + "," + x + "," + y + ")");
 		}
-		int localX = (int)(Gdx.graphics.getWidth() * x);
-		int localY = (int)(Gdx.graphics.getHeight() * y);
+		int localX = (int) (Gdx.graphics.getWidth() * x);
+		int localY = (int) (Gdx.graphics.getHeight() * y);
 		Pointer p = pointers.remove(id);
 		releaseIndex(p.getIndex());
 		inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
@@ -238,13 +229,13 @@ public class LimeInput implements Input {
 	}
 
 	// Called once per frame1
-	public static void lime_frame() {
+	static void lime_frame() {
 		for (int n = 0; n < justPressed.length; n++) justPressed[n] = false;
 		for (int n = 0; n < justReleased.length; n++) justReleased[n] = false;
 		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
 			entry.getValue().frame();
 		}
-		if (!lockMouse){
+		if (!lockMouse) {
 			mousePoint.frame();
 		}
 	}
@@ -458,17 +449,9 @@ public class LimeInput implements Input {
 
 	private boolean checkKeyArray(boolean[] array, int i) {
 		if (i < 0) {
-			for (int n = 0; n < array.length; n++) {
-				if (array[n]) {
-					return true;
-				}
-				return false;
-			}
+			return array.length > 0 && array[0];
 		}
-		if (i >= array.length) {
-			return false;
-		}
-		return array[i];
+		return i < array.length && array[i];
 	}
 
 	@Override
@@ -591,7 +574,7 @@ public class LimeInput implements Input {
 		private double currentY;
 		private int index = -1;
 
-		public void setXY(double x, double y) {
+		void setXY(double x, double y) {
 			this.currentX = x;
 			this.currentY = y;
 		}
@@ -600,7 +583,7 @@ public class LimeInput implements Input {
 			this.currentB = b;
 		}
 
-		public void frame() {
+		void frame() {
 			this.lastX = currentX;
 			this.lastY = currentY;
 			this.lastB = currentB;
@@ -609,6 +592,7 @@ public class LimeInput implements Input {
 		public int getIndex() {
 			return index;
 		}
+
 		public void setIndex(int index) {
 			this.index = index;
 		}
@@ -621,32 +605,32 @@ public class LimeInput implements Input {
 			return currentY;
 		}
 
-		public double getDeltaX() {
+		double getDeltaX() {
 			return currentX - lastX;
 		}
 
-		public double getDeltaY() {
+		double getDeltaY() {
 			return currentY - lastY;
 		}
 
-		public boolean isPressingButton(int i) {
+		boolean isPressingButton(int i) {
 			return (currentB & (1 << i)) != 0;
 		}
 
-		public boolean isPressingAnyButton() {
+		boolean isPressingAnyButton() {
 			return currentB != 0;
 		}
 
-		public boolean justPressedAnyButton() {
+		boolean justPressedAnyButton() {
 			return isPressingAnyButton() && (currentB != lastB);
 		}
 
-		public void pressButton(int button) {
+		void pressButton(int button) {
 			int mask = (1 << button);
 			currentB = (currentB & ~mask) | mask;
 		}
 
-		public void releaseButton(int button) {
+		void releaseButton(int button) {
 			int mask = (1 << button);
 			currentB = (currentB & ~mask);
 		}
