@@ -6,8 +6,11 @@ import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class LimeInput implements Input {
+
+	private static final boolean INPUT_QUEUED = true;
 
 	private static final int MAX_TOUCH_POINTS = 10;
 
@@ -15,6 +18,7 @@ public class LimeInput implements Input {
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
 	private static boolean[] touchIndexes = new boolean[MAX_TOUCH_POINTS];
+	private static final LinkedBlockingDeque<Pointer> inputQueue = new LinkedBlockingDeque<>();
 
 	@HaxeMethodBody(
 		"{% if extra.debugLimeInput %}return {{ extra.debugLimeInput }};{% else %}return false;{% end %}"
@@ -30,6 +34,65 @@ public class LimeInput implements Input {
 			|| LimeDevice.getType() == Application.ApplicationType.Android;
 
 	static private InputProcessor inputProcessor = new InputAdapter();
+
+	public static final int UNDEFINED = 0;
+	public static final int MOUSE_DOWN = 1;
+	public static final int MOUSE_UP = 2;
+	public static final int MOUSE_MOVE = 3;
+	public static final int MOUSE_WHEEL = 4;
+	public static final int TOUCH_START = 5;
+	public static final int TOUCH_END = 6;
+	public static final int TOUCH_MOVE = 7;
+	public static final int KEY_DOWN = 8;
+	public static final int KEY_TYPED = 9;
+	public static final int KEY_UP = 10;
+
+	public static void flushInput() {
+		if (!INPUT_QUEUED) return;
+
+		while (inputQueue.size() > 0) {
+			Pointer p;
+			synchronized (inputQueue) {
+				p = inputQueue.poll();
+			}
+			switch (p.type) {
+				case MOUSE_DOWN:
+				case TOUCH_START:
+					inputProcessor.touchDown((int) p.getX(), (int) p.getY(), p.getIndex(), 0);
+					break;
+				case MOUSE_UP:
+				case TOUCH_END:
+					inputProcessor.touchUp((int) p.getX(), (int) p.getY(), p.getIndex(), 0);
+					break;
+				case MOUSE_MOVE:
+					inputProcessor.mouseMoved((int) p.getX(), (int) p.getY());
+					break;
+				case MOUSE_WHEEL:
+					inputProcessor.scrolled((int) p.getY());
+					break;
+				case TOUCH_MOVE:
+					inputProcessor.touchDragged((int) p.getX(), (int) p.getY(), p.getIndex());
+					break;
+				case KEY_DOWN:
+					break;
+				case KEY_TYPED:
+					break;
+				case KEY_UP:
+					break;
+			}
+		}
+	}
+
+	private static void addPointer(Pointer p) {
+		if (!INPUT_QUEUED || p.type == UNDEFINED) return;
+		synchronized (inputQueue) {
+			try {
+				inputQueue.put(p);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private static int getIndex() {
 		for (int i = 0; i < touchIndexes.length; i++) {
@@ -78,7 +141,11 @@ public class LimeInput implements Input {
 		int localY = toLogicalY(y);
 		mousePoint.setXY(localX, localY);
 		mousePoint.releaseButton(button);
-		inputProcessor.touchUp(localX, localY, 0, button);
+		if (INPUT_QUEUED) {
+			addPointer(new Pointer(localX, localY, TOUCH_END, 0));
+		} else {
+			inputProcessor.touchUp(localX, localY, 0, button);
+		}
 	}
 
 	static void lime_onMouseDown(double x, double y, int button) {
@@ -92,7 +159,11 @@ public class LimeInput implements Input {
 		int localY = toLogicalY(y);
 		mousePoint.setXY(localX, localY);
 		mousePoint.pressButton(button);
-		inputProcessor.touchDown(localX, localY, 0, button);
+		if (INPUT_QUEUED) {
+			addPointer(new Pointer(localX, localY, TOUCH_START, 0));
+		} else {
+			inputProcessor.touchDown(localX, localY, 0, button);
+		}
 	}
 
 	static void lime_onMouseMove(double x, double y) {
@@ -105,10 +176,14 @@ public class LimeInput implements Input {
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
 		mousePoint.setXY(localX, localY);
-		if (mousePoint.isPressingAnyButton()) {
-			inputProcessor.touchDragged(localX, localY, 0);
+		if (INPUT_QUEUED) {
+			addPointer(new Pointer(localX, localY, mousePoint.isPressingAnyButton() ? TOUCH_MOVE : MOUSE_MOVE, 0));
 		} else {
-			inputProcessor.mouseMoved(localX, localY);
+			if (mousePoint.isPressingAnyButton()) {
+				inputProcessor.touchDragged(localX, localY, 0);
+			} else {
+				inputProcessor.mouseMoved(localX, localY);
+			}
 		}
 	}
 
@@ -117,7 +192,11 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onWheel(" + x + ", " + y + ", " + z + ")");
 		}
-		inputProcessor.scrolled((int) -y);
+		if (INPUT_QUEUED) {
+			addPointer(new Pointer(x, y, MOUSE_WHEEL, 0));
+		} else {
+			inputProcessor.scrolled((int) -y);
+		}
 	}
 
 	static void lime_onKeyUp(int keyCode, int modifier) {
@@ -158,7 +237,12 @@ public class LimeInput implements Input {
 		p.pressButton(0);
 		p.setIndex(getIndex());
 		pointers.put(id, p);
-		inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
+		if (INPUT_QUEUED) {
+			p.type = TOUCH_START;
+			addPointer(p);
+		} else {
+			inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
+		}
 	}
 
 	static void lime_onTouchMove(int id, double x, double y) {
@@ -169,7 +253,12 @@ public class LimeInput implements Input {
 		int localY = (int) (Gdx.graphics.getHeight() * y);
 		Pointer p = pointers.get(id);
 		p.setXY(localX, localY);
-		inputProcessor.touchDragged(localX, localY, p.getIndex());
+		if (INPUT_QUEUED) {
+			p.type = TOUCH_MOVE;
+			addPointer(p);
+		} else {
+			inputProcessor.touchDragged(localX, localY, p.getIndex());
+		}
 	}
 
 	static void lime_onTouchEnd(int id, double x, double y) {
@@ -180,7 +269,12 @@ public class LimeInput implements Input {
 		int localY = (int) (Gdx.graphics.getHeight() * y);
 		Pointer p = pointers.remove(id);
 		releaseIndex(p.getIndex());
-		inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
+		if (INPUT_QUEUED) {
+			p.type = TOUCH_END;
+			addPointer(p);
+		} else {
+			inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -571,6 +665,17 @@ public class LimeInput implements Input {
 		private double currentX;
 		private double currentY;
 		private int index = -1;
+		public int type;
+
+		public Pointer() {
+		}
+
+		public Pointer(double x, double y, int type, int index) {
+			currentX = x;
+			currentY = y;
+			this.type = type;
+			this.index = index;
+		}
 
 		void setXY(double x, double y) {
 			this.currentX = x;
