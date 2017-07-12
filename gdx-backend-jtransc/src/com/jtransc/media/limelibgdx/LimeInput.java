@@ -35,19 +35,19 @@ public class LimeInput implements Input {
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
-	public static final int UNDEFINED = 0;
-	public static final int MOUSE_DOWN = 1;
-	public static final int MOUSE_UP = 2;
-	public static final int MOUSE_MOVE = 3;
-	public static final int MOUSE_WHEEL = 4;
-	public static final int TOUCH_START = 5;
-	public static final int TOUCH_END = 6;
-	public static final int TOUCH_MOVE = 7;
-	public static final int KEY_DOWN = 8;
-	public static final int KEY_TYPED = 9;
-	public static final int KEY_UP = 10;
+	private static final int UNDEFINED = 0;
+	private static final int MOUSE_DOWN = 1;
+	private static final int MOUSE_UP = 2;
+	private static final int MOUSE_MOVE = 3;
+	private static final int MOUSE_WHEEL = 4;
+	private static final int TOUCH_START = 5;
+	private static final int TOUCH_END = 6;
+	private static final int TOUCH_MOVE = 7;
+	private static final int KEY_DOWN = 8;
+	private static final int KEY_TYPED = 9;
+	private static final int KEY_UP = 10;
 
-	public static void flushInput() {
+	static void flushInput() {
 		if (!INPUT_QUEUED) return;
 
 		while (inputQueue.size() > 0) {
@@ -238,8 +238,7 @@ public class LimeInput implements Input {
 		p.setIndex(getIndex());
 		pointers.put(id, p);
 		if (INPUT_QUEUED) {
-			p.type = TOUCH_START;
-			addPointer(p);
+			addPointer(new Pointer(localX, localY, TOUCH_START, p.getIndex()));
 		} else {
 			inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
 		}
@@ -254,8 +253,7 @@ public class LimeInput implements Input {
 		Pointer p = pointers.get(id);
 		p.setXY(localX, localY);
 		if (INPUT_QUEUED) {
-			p.type = TOUCH_MOVE;
-			addPointer(p);
+			addPointer(new Pointer(localX, localY, TOUCH_MOVE, p.getIndex()));
 		} else {
 			inputProcessor.touchDragged(localX, localY, p.getIndex());
 		}
@@ -271,7 +269,7 @@ public class LimeInput implements Input {
 		releaseIndex(p.getIndex());
 		if (INPUT_QUEUED) {
 			p.type = TOUCH_END;
-			addPointer(p);
+			addPointer(new Pointer(localX, localY, TOUCH_END, p.getIndex()));
 		} else {
 			inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
 		}
@@ -667,10 +665,10 @@ public class LimeInput implements Input {
 		private int index = -1;
 		public int type;
 
-		public Pointer() {
+		Pointer() {
 		}
 
-		public Pointer(double x, double y, int type, int index) {
+		Pointer(double x, double y, int type, int index) {
 			currentX = x;
 			currentY = y;
 			this.type = type;
