@@ -50,6 +50,7 @@ public class LimeInput implements Input {
 	static void flushInput() {
 		if (!INPUT_QUEUED) return;
 
+		Pointer real_p;
 		while (inputQueue.size() > 0) {
 			Pointer p;
 			synchronized (inputQueue) {
@@ -57,21 +58,41 @@ public class LimeInput implements Input {
 			}
 			switch (p.type) {
 				case MOUSE_DOWN:
+					mousePoint.pressButton(0);
+					mousePoint.setXY(p.getX(), p.getY());
+					inputProcessor.touchDown((int) p.getX(), (int) p.getY(), 0, 0);
+					break;
 				case TOUCH_START:
+					int id = p.getIndex();
+					p.setIndex(getIndex());
+					pointers.put(id, p);
 					inputProcessor.touchDown((int) p.getX(), (int) p.getY(), p.getIndex(), 0);
 					break;
 				case MOUSE_UP:
+					mousePoint.setXY(p.getX(), p.getY());
+					mousePoint.releaseButton(0);
+					inputProcessor.touchUp((int) p.getX(), (int) p.getY(), 0, 0);
+					break;
 				case TOUCH_END:
-					inputProcessor.touchUp((int) p.getX(), (int) p.getY(), p.getIndex(), 0);
+					real_p = pointers.remove(p.getIndex());
+					releaseIndex(real_p.getIndex());
+					inputProcessor.touchUp((int) p.getX(), (int) p.getY(), real_p.getIndex(), 0);
 					break;
 				case MOUSE_MOVE:
-					inputProcessor.mouseMoved((int) p.getX(), (int) p.getY());
+					mousePoint.setXY(p.getX(), p.getY());
+					if (mousePoint.isPressingAnyButton()) {
+						inputProcessor.touchDragged((int) p.getX(), (int) p.getY(), 0);
+					} else {
+						inputProcessor.mouseMoved((int) p.getX(), (int) p.getY());
+					}
 					break;
 				case MOUSE_WHEEL:
 					inputProcessor.scrolled((int) p.getY());
 					break;
 				case TOUCH_MOVE:
-					inputProcessor.touchDragged((int) p.getX(), (int) p.getY(), p.getIndex());
+					real_p = pointers.get(p.getIndex());
+					real_p.setXY(p.getX(), p.getY());
+					inputProcessor.touchDragged((int) p.getX(), (int) p.getY(), real_p.getIndex());
 					break;
 				case KEY_DOWN:
 					break;
@@ -139,11 +160,11 @@ public class LimeInput implements Input {
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		mousePoint.setXY(localX, localY);
-		mousePoint.releaseButton(button);
 		if (INPUT_QUEUED) {
-			addPointer(new Pointer(localX, localY, TOUCH_END, 0));
+			addPointer(new Pointer(localX, localY, MOUSE_UP, 0));
 		} else {
+			mousePoint.setXY(localX, localY);
+			mousePoint.releaseButton(button);
 			inputProcessor.touchUp(localX, localY, 0, button);
 		}
 	}
@@ -157,11 +178,11 @@ public class LimeInput implements Input {
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		mousePoint.setXY(localX, localY);
-		mousePoint.pressButton(button);
 		if (INPUT_QUEUED) {
-			addPointer(new Pointer(localX, localY, TOUCH_START, 0));
+			addPointer(new Pointer(localX, localY, MOUSE_DOWN, 0));
 		} else {
+			mousePoint.setXY(localX, localY);
+			mousePoint.pressButton(button);
 			inputProcessor.touchDown(localX, localY, 0, button);
 		}
 	}
@@ -175,10 +196,10 @@ public class LimeInput implements Input {
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		mousePoint.setXY(localX, localY);
 		if (INPUT_QUEUED) {
-			addPointer(new Pointer(localX, localY, mousePoint.isPressingAnyButton() ? TOUCH_MOVE : MOUSE_MOVE, 0));
+			addPointer(new Pointer(localX, localY, MOUSE_MOVE, 0));
 		} else {
+			mousePoint.setXY(localX, localY);
 			if (mousePoint.isPressingAnyButton()) {
 				inputProcessor.touchDragged(localX, localY, 0);
 			} else {
@@ -235,11 +256,13 @@ public class LimeInput implements Input {
 		Pointer p = new Pointer();
 		p.setXY(localX, localY);
 		p.pressButton(0);
-		p.setIndex(getIndex());
-		pointers.put(id, p);
 		if (INPUT_QUEUED) {
-			addPointer(new Pointer(localX, localY, TOUCH_START, p.getIndex()));
+			p.setIndex(id);
+			p.type = TOUCH_START;
+			addPointer(p);
 		} else {
+			p.setIndex(getIndex());
+			pointers.put(id, p);
 			inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
 		}
 	}
@@ -250,11 +273,11 @@ public class LimeInput implements Input {
 		}
 		int localX = (int) (Gdx.graphics.getWidth() * x);
 		int localY = (int) (Gdx.graphics.getHeight() * y);
-		Pointer p = pointers.get(id);
-		p.setXY(localX, localY);
 		if (INPUT_QUEUED) {
-			addPointer(new Pointer(localX, localY, TOUCH_MOVE, p.getIndex()));
+			addPointer(new Pointer(localX, localY, TOUCH_MOVE, id));
 		} else {
+			Pointer p = pointers.get(id);
+			p.setXY(localX, localY);
 			inputProcessor.touchDragged(localX, localY, p.getIndex());
 		}
 	}
@@ -265,12 +288,11 @@ public class LimeInput implements Input {
 		}
 		int localX = (int) (Gdx.graphics.getWidth() * x);
 		int localY = (int) (Gdx.graphics.getHeight() * y);
-		Pointer p = pointers.remove(id);
-		releaseIndex(p.getIndex());
 		if (INPUT_QUEUED) {
-			p.type = TOUCH_END;
-			addPointer(new Pointer(localX, localY, TOUCH_END, p.getIndex()));
+			addPointer(new Pointer(localX, localY, TOUCH_END, id));
 		} else {
+			Pointer p = pointers.remove(id);
+			releaseIndex(p.getIndex());
 			inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
 		}
 	}
