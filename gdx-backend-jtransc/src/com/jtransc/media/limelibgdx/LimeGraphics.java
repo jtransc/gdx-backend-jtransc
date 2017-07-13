@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Cursor;
@@ -57,20 +58,39 @@ public class LimeGraphics implements Graphics {
 		return currentHeight;
 	}
 
+	private static final float BASIC_APPLE_PPI = 132f;
+
+	@HaxeMethodBody("{% if extra.allowHighDpi %}return {{ extra.allowHighDpi }};{% else %}return false;{% end %}")
+	private static boolean isAllowHighDpi() {
+		return false;
+	}
+
 	@Override
 	public int getBackBufferWidth() {
+		int backBufferWidth;
 		if (isFullscreen()) {
-			return LimeApplication.getDisplayWidth();
+			backBufferWidth = LimeApplication.getDisplayWidth();
+		} else {
+			backBufferWidth = LimeApplication.getWindowWidth();
 		}
-		return LimeApplication.getWindowWidth();
+		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
+			backBufferWidth = (int)(backBufferWidth * (getPpi() / BASIC_APPLE_PPI));
+		}
+		return backBufferWidth;
 	}
 
 	@Override
 	public int getBackBufferHeight() {
+		int backBufferHeight;
 		if (isFullscreen()) {
-			return LimeApplication.getDisplayHeight();
+			backBufferHeight = LimeApplication.getDisplayHeight();
+		} else {
+			backBufferHeight = LimeApplication.getWindowHeight();
 		}
-		return LimeApplication.getWindowHeight();
+		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
+			backBufferHeight = (int)(backBufferHeight * (getPpi() / BASIC_APPLE_PPI));
+		}
+		return backBufferHeight;
 	}
 
 	void onResized(int width, int height) {
