@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
+import com.jtransc.media.limelibgdx.LimeApplication;
 
 import java.util.ArrayList;
 
@@ -63,6 +64,7 @@ public class DebugInfo implements Disposable {
 			int backBufferHeight = Gdx.graphics.getBackBufferHeight();
 			displayInfo += " buffer[" + backBufferWidth + "," + backBufferHeight + "]";
 			displayInfo += " ppi[" + Gdx.graphics.getPpiX() + "]";
+			displayInfo += " scale[" + LimeApplication.getApplicationScale() + "]";
 			debugInfo.add(displayInfo);
 		}
 

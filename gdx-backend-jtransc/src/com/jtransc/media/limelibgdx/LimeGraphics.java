@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Cursor;
@@ -60,17 +61,17 @@ public class LimeGraphics implements Graphics {
 	@Override
 	public int getBackBufferWidth() {
 		if (isFullscreen()) {
-			return LimeApplication.getDisplayWidth();
+			return (int)(LimeApplication.getDisplayWidth() * LimeApplication.getApplicationScale());
 		}
-		return LimeApplication.getWindowWidth();
+		return (int)(LimeApplication.getWindowWidth() * LimeApplication.getApplicationScale());
 	}
 
 	@Override
 	public int getBackBufferHeight() {
 		if (isFullscreen()) {
-			return LimeApplication.getDisplayHeight();
+			return (int)(LimeApplication.getDisplayHeight() * LimeApplication.getApplicationScale());
 		}
-		return LimeApplication.getWindowHeight();
+		return (int)(LimeApplication.getWindowHeight() * LimeApplication.getApplicationScale());
 	}
 
 	void onResized(int width, int height) {
