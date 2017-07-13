@@ -232,8 +232,8 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return LwjglApplicationConfiguration.defaultHeight;
 	}
 
-	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowScale();")
-	public static float getWindowScale() {
+	@HaxeMethodBody("return lime.app.Application.current.window.scale;")
+	public static float getApplicationScale() {
 		return 1f;
 	}
 

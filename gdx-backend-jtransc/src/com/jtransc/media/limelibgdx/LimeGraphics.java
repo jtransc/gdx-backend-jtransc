@@ -72,7 +72,7 @@ public class LimeGraphics implements Graphics {
 			backBufferWidth = LimeApplication.getWindowWidth();
 		}
 		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
-			backBufferWidth = (int)(backBufferWidth * LimeApplication.getWindowScale());
+			backBufferWidth = (int)(backBufferWidth * LimeApplication.getApplicationScale());
 		}
 		return backBufferWidth;
 	}
@@ -86,7 +86,7 @@ public class LimeGraphics implements Graphics {
 			backBufferHeight = LimeApplication.getWindowHeight();
 		}
 		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
-			backBufferHeight = (int)(backBufferHeight * LimeApplication.getWindowScale());
+			backBufferHeight = (int)(backBufferHeight * LimeApplication.getApplicationScale());
 		}
 		return backBufferHeight;
 	}
