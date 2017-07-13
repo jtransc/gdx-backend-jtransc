@@ -58,8 +58,6 @@ public class LimeGraphics implements Graphics {
 		return currentHeight;
 	}
 
-	private static final float BASIC_APPLE_PPI = 132f;
-
 	@HaxeMethodBody("{% if extra.allowHighDpi %}return {{ extra.allowHighDpi }};{% else %}return false;{% end %}")
 	private static boolean isAllowHighDpi() {
 		return false;
@@ -74,7 +72,7 @@ public class LimeGraphics implements Graphics {
 			backBufferWidth = LimeApplication.getWindowWidth();
 		}
 		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
-			backBufferWidth = (int)(backBufferWidth * (getPpi() / BASIC_APPLE_PPI));
+			backBufferWidth = (int)(backBufferWidth * LimeApplication.getWindowScale());
 		}
 		return backBufferWidth;
 	}
@@ -88,7 +86,7 @@ public class LimeGraphics implements Graphics {
 			backBufferHeight = LimeApplication.getWindowHeight();
 		}
 		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
-			backBufferHeight = (int)(backBufferHeight * (getPpi() / BASIC_APPLE_PPI));
+			backBufferHeight = (int)(backBufferHeight * LimeApplication.getWindowScale());
 		}
 		return backBufferHeight;
 	}

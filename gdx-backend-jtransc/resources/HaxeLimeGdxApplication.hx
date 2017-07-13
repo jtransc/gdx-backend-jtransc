@@ -29,6 +29,9 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	public function getWindowHeight() {
 		return window.height;
 	}
+	public function getWindowScale() {
+		return window.scale;
+	}
 
 	public function getDisplayWidth(id:Int) {
 		return System.getDisplay(id).currentMode.width;
