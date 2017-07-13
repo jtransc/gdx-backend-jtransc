@@ -10,12 +10,6 @@ import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.util.ArrayList;
 
-/**
- * A nicer class for showing framerate that doesn't spam the console
- * like Logger.log()
- *
- * @author William Hartman
- */
 public class DebugInfo implements Disposable {
 
 	private BitmapFont font;
@@ -60,19 +54,25 @@ public class DebugInfo implements Disposable {
 			debugInfo.add(fps + " fps");
 		}
 
+		if (isShowDebugInfo() && Gdx.graphics != null) {
+			String displayInfo = "Display info:";
+			int width = Gdx.graphics.getWidth();
+			int height = Gdx.graphics.getHeight();
+			displayInfo += " size[" + width + "," + height + "]";
+			int backBufferWidth = Gdx.graphics.getBackBufferWidth();
+			int backBufferHeight = Gdx.graphics.getBackBufferHeight();
+			displayInfo += " buffer[" + backBufferWidth + "," + backBufferHeight + "]";
+			displayInfo += " ppi[" + Gdx.graphics.getPpiX() + "]";
+			debugInfo.add(displayInfo);
+		}
+
 		if (isShowMemoryInfo()) {
 			debugInfo.add("Memory info:");
-
 			JTranscSystem.gc();
 			debugInfo.add("used: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) >> 20) + " MB");
 			debugInfo.add("free: " + (Runtime.getRuntime().freeMemory() >> 20) + " MB");
 			debugInfo.add("total: " + (Runtime.getRuntime().totalMemory() >> 20) + " MB");
 		}
-	}
-
-	@HaxeMethodBody("cpp.vm.Gc.run(true);")
-	private void gc() {
-		System.gc();
 	}
 
 	public void render() {
@@ -87,11 +87,6 @@ public class DebugInfo implements Disposable {
 		batch.end();
 	}
 
-	@HaxeMethodBody("return cpp.vm.Gc.memInfo(p0);")
-	public int memInfo(int type) {
-		return 0;
-	}
-
 	@HaxeMethodBody("{% if extra.showFPS %}return {{ extra.showFPS }};{% else %}return false;{% end %}")
 	private static boolean isShowFPS() {
 		return false;
@@ -102,8 +97,13 @@ public class DebugInfo implements Disposable {
 		return false;
 	}
 
+	@HaxeMethodBody("{% if extra.showDisplayInfo %}return {{ extra.showDisplayInfo }};{% else %}return false;{% end %}")
+	private static boolean isShowDisplayInfo() {
+		return false;
+	}
+
 	public static boolean isShowDebugInfo() {
-		return isShowFPS() || isShowMemoryInfo();
+		return isShowFPS() || isShowDisplayInfo() || isShowMemoryInfo();
 	}
 
 	public void dispose() {
