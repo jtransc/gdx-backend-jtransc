@@ -58,37 +58,20 @@ public class LimeGraphics implements Graphics {
 		return currentHeight;
 	}
 
-	@HaxeMethodBody("{% if extra.allowHighDpi %}return {{ extra.allowHighDpi }};{% else %}return false;{% end %}")
-	private static boolean isAllowHighDpi() {
-		return false;
-	}
-
 	@Override
 	public int getBackBufferWidth() {
-		int backBufferWidth;
 		if (isFullscreen()) {
-			backBufferWidth = LimeApplication.getDisplayWidth();
-		} else {
-			backBufferWidth = LimeApplication.getWindowWidth();
+			return (int)(LimeApplication.getDisplayWidth() * LimeApplication.getApplicationScale());
 		}
-		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
-			backBufferWidth = (int)(backBufferWidth * LimeApplication.getApplicationScale());
-		}
-		return backBufferWidth;
+		return (int)(LimeApplication.getWindowWidth() * LimeApplication.getApplicationScale());
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		int backBufferHeight;
 		if (isFullscreen()) {
-			backBufferHeight = LimeApplication.getDisplayHeight();
-		} else {
-			backBufferHeight = LimeApplication.getWindowHeight();
+			return (int)(LimeApplication.getDisplayHeight() * LimeApplication.getApplicationScale());
 		}
-		if (isAllowHighDpi() && LimeDevice.getType() == Application.ApplicationType.iOS) {
-			backBufferHeight = (int)(backBufferHeight * LimeApplication.getApplicationScale());
-		}
-		return backBufferHeight;
+		return (int)(LimeApplication.getWindowHeight() * LimeApplication.getApplicationScale());
 	}
 
 	void onResized(int width, int height) {

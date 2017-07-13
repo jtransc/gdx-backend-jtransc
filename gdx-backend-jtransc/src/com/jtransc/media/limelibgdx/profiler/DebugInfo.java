@@ -60,11 +60,11 @@ public class DebugInfo implements Disposable {
 			int width = Gdx.graphics.getWidth();
 			int height = Gdx.graphics.getHeight();
 			displayInfo += " size[" + width + "," + height + "]";
-			displayInfo += " scale[" + LimeApplication.getApplicationScale() + "]";
 			int backBufferWidth = Gdx.graphics.getBackBufferWidth();
 			int backBufferHeight = Gdx.graphics.getBackBufferHeight();
 			displayInfo += " buffer[" + backBufferWidth + "," + backBufferHeight + "]";
 			displayInfo += " ppi[" + Gdx.graphics.getPpiX() + "]";
+			displayInfo += " scale[" + LimeApplication.getApplicationScale() + "]";
 			debugInfo.add(displayInfo);
 		}
 
