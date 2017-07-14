@@ -8,6 +8,8 @@ import java.util.ArrayDeque;
 
 public class LimeInput implements Input {
 
+	private static boolean APPLE_TV = true;
+
 	private static final int MAX_TOUCH_POINTS = 20;
 
 	private static final int UNDEFINED = 0;
@@ -31,15 +33,15 @@ public class LimeInput implements Input {
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
 
-	private static Pointer[] workingPointers = new Pointer[MAX_TOUCH_POINTS];
+	private static final Pointer[] workingPointers = new Pointer[MAX_TOUCH_POINTS];
 	private static final ArrayDeque<Pointer> queuedPointers = new ArrayDeque<>();
 	private static final ArrayDeque<Pointer> freePointers = new ArrayDeque<>();
 
 	private static final Pointer mousePoint = new Pointer();
 
-	private static boolean lockMouse =
-		LimeDevice.getType() == Application.ApplicationType.iOS
-			|| LimeDevice.getType() == Application.ApplicationType.Android;
+	private static boolean lockMouse = !APPLE_TV &&
+		(LimeDevice.getType() == Application.ApplicationType.iOS
+			|| LimeDevice.getType() == Application.ApplicationType.Android);
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
@@ -136,6 +138,10 @@ public class LimeInput implements Input {
 	}
 
 	private static int toLogicalX(double realX) {
+		if (APPLE_TV) {
+			realX -= 0.5;
+			return (int) (realX * Gdx.graphics.getWidth());
+		}
 		float realWidth;
 		if (Gdx.graphics.isFullscreen()) {
 			realWidth = LimeApplication.getDisplayWidth();
@@ -146,6 +152,10 @@ public class LimeInput implements Input {
 	}
 
 	private static int toLogicalY(double realY) {
+		if (APPLE_TV) {
+			realY -= 0.5;
+			return (int) (realY * Gdx.graphics.getHeight());
+		}
 		float realHeight;
 		if (Gdx.graphics.isFullscreen()) {
 			realHeight = LimeApplication.getDisplayHeight();
@@ -156,53 +166,65 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onMouseUp(double x, double y, int button) {
-		if (lockMouse) {
-			return;
-		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
+		}
+		if (lockMouse) {
+			return;
 		}
 		addPointer(toLogicalX(x), toLogicalY(y), MOUSE_UP, button);
 	}
 
 	private static void lime_onMouseUp0(Pointer p) {
-		mousePoint.setXY(p.getX(), p.getY());
+		if (APPLE_TV) {
+			mousePoint.addXY(p.getX(), p.getY());
+		} else {
+			mousePoint.setXY(p.getX(), p.getY());
+		}
 		mousePoint.releaseButton(p.customData);
-		inputProcessor.touchUp((int) p.getX(), (int) p.getY(), 0, p.customData);
+		inputProcessor.touchUp((int) mousePoint.getX(), (int) mousePoint.getY(), 0, p.customData);
 	}
 
 	static void lime_onMouseDown(double x, double y, int button) {
-		if (lockMouse) {
-			return;
-		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
+		}
+		if (lockMouse) {
+			return;
 		}
 		addPointer(toLogicalX(x), toLogicalY(y), MOUSE_DOWN, button);
 	}
 
 	private static void lime_onMouseDown0(Pointer p) {
+		if (APPLE_TV) {
+			mousePoint.addXY(p.getX(), p.getY());
+		} else {
+			mousePoint.setXY(p.getX(), p.getY());
+		}
 		mousePoint.pressButton(p.customData);
-		mousePoint.setXY(p.getX(), p.getY());
-		inputProcessor.touchDown((int) p.getX(), (int) p.getY(), 0, p.customData);
+		inputProcessor.touchDown((int) mousePoint.getX(), (int) mousePoint.getY(), 0, p.customData);
 	}
 
 	static void lime_onMouseMove(double x, double y) {
-		if (lockMouse) {
-			return;
-		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseMove(" + x + "," + y + ")");
+		}
+		if (lockMouse) {
+			return;
 		}
 		addPointer(toLogicalX(x), toLogicalY(y), MOUSE_MOVE);
 	}
 
 	private static void lime_onMouseMove0(Pointer p) {
-		mousePoint.setXY(p.getX(), p.getY());
-		if (mousePoint.isPressingAnyButton()) {
-			inputProcessor.touchDragged((int) p.getX(), (int) p.getY(), 0);
+		if (APPLE_TV) {
+			mousePoint.addXY(p.getX(), p.getY());
 		} else {
-			inputProcessor.mouseMoved((int) p.getX(), (int) p.getY());
+			mousePoint.setXY(p.getX(), p.getY());
+		}
+		if (mousePoint.isPressingAnyButton()) {
+			inputProcessor.touchDragged((int) mousePoint.getX(), (int) mousePoint.getY(), 0);
+		} else {
+			inputProcessor.mouseMoved((int) mousePoint.getX(), (int) mousePoint.getY());
 		}
 	}
 
@@ -673,10 +695,10 @@ public class LimeInput implements Input {
 	private static class Pointer {
 		private int lastB;
 		private int currentB;
-		private double lastX;
-		private double lastY;
-		private double currentX;
-		private double currentY;
+		private double lastX = -1;
+		private double lastY = -1;
+		private double currentX = -1;
+		private double currentY = -1;
 
 		private int index = -1;
 		private int type;
@@ -684,7 +706,7 @@ public class LimeInput implements Input {
 		private boolean isFree = true;
 
 		void reset() {
-			lastX = lastY = currentY = currentX = 0;
+			lastX = lastY = currentY = currentX = -1;
 			customData = lastB = currentB = 0;
 			type = UNDEFINED;
 			index = -1;
@@ -694,6 +716,20 @@ public class LimeInput implements Input {
 		void setXY(double x, double y) {
 			this.currentX = x;
 			this.currentY = y;
+		}
+
+		void addXY(double deltaX, double deltaY) {
+			int w = Gdx.graphics.getWidth();
+			int h = Gdx.graphics.getHeight();
+			if (currentX < 0 || currentY < 0) { // Set init values for Apple TV
+				currentX = w * 0.5;
+				currentY = h * 0.5;
+			}
+			currentX += deltaX;
+			currentY += deltaY;
+
+			currentX = currentX < 0 ? 0 : currentX > w ? w : currentX;
+			currentY = currentY < 0 ? 0 : currentY > h ? h : currentY;
 		}
 
 		public void setB(int b) {
