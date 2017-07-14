@@ -93,7 +93,7 @@ public class LimeInput implements Input {
 			}
 			p.reset();
 			synchronized (freePointers) {
-				freePointers.push(p);
+				freePointers.add(p);
 			}
 		}
 	}
@@ -108,7 +108,7 @@ public class LimeInput implements Input {
 		p.type = type;
 		p.customData = data;
 		synchronized (queuedPointers) {
-			queuedPointers.push(p);
+			queuedPointers.add(p);
 		}
 	}
 
@@ -680,14 +680,14 @@ public class LimeInput implements Input {
 
 		private int index = -1;
 		private int type;
-		private int customData = -1;
+		private int customData = 0;
 		private boolean isFree = true;
 
 		void reset() {
+			lastX = lastY = currentY = currentX = 0;
+			customData = lastB = currentB = 0;
 			type = UNDEFINED;
-			lastX = lastY = currentY = currentX = lastB = currentB = 0;
 			index = -1;
-			customData = -1;
 			isFree = true;
 		}
 
