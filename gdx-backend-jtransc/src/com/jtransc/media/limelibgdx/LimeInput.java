@@ -1,6 +1,11 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 
@@ -31,17 +36,20 @@ public class LimeInput implements Input {
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
 
-	private static Pointer[] workingPointers = new Pointer[MAX_TOUCH_POINTS];
+	private static final Pointer[] workingPointers = new Pointer[MAX_TOUCH_POINTS];
 	private static final ArrayDeque<Pointer> queuedPointers = new ArrayDeque<>();
 	private static final ArrayDeque<Pointer> freePointers = new ArrayDeque<>();
 
 	private static final Pointer mousePoint = new Pointer();
 
-	private static boolean lockMouse =
-		LimeDevice.getType() == Application.ApplicationType.iOS
-			|| LimeDevice.getType() == Application.ApplicationType.Android;
+	private static boolean lockMouse = !LimeDevice.isTvos() &&
+		(LimeDevice.getType() == Application.ApplicationType.iOS
+			|| LimeDevice.getType() == Application.ApplicationType.Android);
 
 	static private InputProcessor inputProcessor = new InputAdapter();
+
+	private static TextureRegion cursor;
+	private static SpriteBatch batch;
 
 	static {
 		for (int i = 0; i < MAX_TOUCH_POINTS; i++) {
@@ -142,7 +150,11 @@ public class LimeInput implements Input {
 		} else {
 			realWidth = LimeApplication.getWindowWidth();
 		}
-		return (int) (realX * (Gdx.graphics.getWidth() / realWidth));
+		realX /= realWidth;
+		if (LimeDevice.isTvos()) {
+			realX -= 0.5;
+		}
+		return (int) (realX * Gdx.graphics.getWidth());
 	}
 
 	private static int toLogicalY(double realY) {
@@ -152,7 +164,11 @@ public class LimeInput implements Input {
 		} else {
 			realHeight = LimeApplication.getWindowHeight();
 		}
-		return (int) (realY * (Gdx.graphics.getHeight() / realHeight));
+		realY /= realHeight;
+		if (LimeDevice.isTvos()) {
+			realY -= 0.5;
+		}
+		return (int) (realY * Gdx.graphics.getHeight());
 	}
 
 	static void lime_onMouseUp(double x, double y, int button) {
@@ -166,9 +182,13 @@ public class LimeInput implements Input {
 	}
 
 	private static void lime_onMouseUp0(Pointer p) {
-		mousePoint.setXY(p.getX(), p.getY());
+		if (LimeDevice.isTvos()) {
+			mousePoint.addXY(p.getX(), p.getY());
+		} else {
+			mousePoint.setXY(p.getX(), p.getY());
+		}
 		mousePoint.releaseButton(p.customData);
-		inputProcessor.touchUp((int) p.getX(), (int) p.getY(), 0, p.customData);
+		inputProcessor.touchUp((int) mousePoint.getX(), (int) mousePoint.getY(), 0, p.customData);
 	}
 
 	static void lime_onMouseDown(double x, double y, int button) {
@@ -182,9 +202,13 @@ public class LimeInput implements Input {
 	}
 
 	private static void lime_onMouseDown0(Pointer p) {
+		if (LimeDevice.isTvos()) {
+			mousePoint.addXY(p.getX(), p.getY());
+		} else {
+			mousePoint.setXY(p.getX(), p.getY());
+		}
 		mousePoint.pressButton(p.customData);
-		mousePoint.setXY(p.getX(), p.getY());
-		inputProcessor.touchDown((int) p.getX(), (int) p.getY(), 0, p.customData);
+		inputProcessor.touchDown((int) mousePoint.getX(), (int) mousePoint.getY(), 0, p.customData);
 	}
 
 	static void lime_onMouseMove(double x, double y) {
@@ -198,11 +222,15 @@ public class LimeInput implements Input {
 	}
 
 	private static void lime_onMouseMove0(Pointer p) {
-		mousePoint.setXY(p.getX(), p.getY());
-		if (mousePoint.isPressingAnyButton()) {
-			inputProcessor.touchDragged((int) p.getX(), (int) p.getY(), 0);
+		if (LimeDevice.isTvos()) {
+			mousePoint.addXY(p.getX(), p.getY());
 		} else {
-			inputProcessor.mouseMoved((int) p.getX(), (int) p.getY());
+			mousePoint.setXY(p.getX(), p.getY());
+		}
+		if (mousePoint.isPressingAnyButton()) {
+			inputProcessor.touchDragged((int) mousePoint.getX(), (int) mousePoint.getY(), 0);
+		} else {
+			inputProcessor.mouseMoved((int) mousePoint.getX(), (int) mousePoint.getY());
 		}
 	}
 
@@ -258,6 +286,9 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onTouchStart(int id, double x, double y) {
+		if (LimeDevice.isTvos()) {
+			return;
+		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchStart(" + id + "," + x + "," + y + ")");
 		}
@@ -276,6 +307,9 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onTouchMove(int id, double x, double y) {
+		if (LimeDevice.isTvos()) {
+			return;
+		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchMove(" + id + "," + x + "," + y + ")");
 		}
@@ -291,6 +325,9 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onTouchEnd(int id, double x, double y) {
+		if (LimeDevice.isTvos()) {
+			return;
+		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchEnd(" + id + "," + x + "," + y + ")");
 		}
@@ -359,6 +396,20 @@ public class LimeInput implements Input {
 		}
 		if (!lockMouse) {
 			mousePoint.frame();
+			if (LimeDevice.isTvos()) {
+				if (batch == null) {
+					Pixmap circle = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
+					circle.setColor(Color.RED);
+					circle.fill();
+					cursor = new TextureRegion(new Texture(circle), 10, 10);
+					circle.dispose();
+					batch = new SpriteBatch();
+					batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				}
+				batch.begin();
+				batch.draw(cursor, (float) mousePoint.getX(), (float) (Gdx.graphics.getHeight() - mousePoint.getY()));
+				batch.end();
+			}
 		}
 	}
 
@@ -673,10 +724,10 @@ public class LimeInput implements Input {
 	private static class Pointer {
 		private int lastB;
 		private int currentB;
-		private double lastX;
-		private double lastY;
-		private double currentX;
-		private double currentY;
+		private double lastX = -1;
+		private double lastY = -1;
+		private double currentX = -1;
+		private double currentY = -1;
 
 		private int index = -1;
 		private int type;
@@ -684,7 +735,7 @@ public class LimeInput implements Input {
 		private boolean isFree = true;
 
 		void reset() {
-			lastX = lastY = currentY = currentX = 0;
+			lastX = lastY = currentY = currentX = -1;
 			customData = lastB = currentB = 0;
 			type = UNDEFINED;
 			index = -1;
@@ -694,6 +745,20 @@ public class LimeInput implements Input {
 		void setXY(double x, double y) {
 			this.currentX = x;
 			this.currentY = y;
+		}
+
+		void addXY(double deltaX, double deltaY) {
+			int w = Gdx.graphics.getWidth();
+			int h = Gdx.graphics.getHeight();
+			if (currentX < 0 || currentY < 0) { // Set init values for Apple TV
+				currentX = w * 0.5;
+				currentY = h * 0.5;
+			}
+			currentX += deltaX;
+			currentY += deltaY;
+
+			currentX = currentX < 0 ? 0 : currentX > w ? w : currentX;
+			currentY = currentY < 0 ? 0 : currentY > h ? h : currentY;
 		}
 
 		public void setB(int b) {

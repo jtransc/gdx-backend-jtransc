@@ -20,7 +20,7 @@ public class LimeDevice {
 
 	@HaxeMethodBody(target = "tvos", value = "return true;")
 	@HaxeMethodBody("return false;")
-	private static boolean isTvos() {
+	static boolean isTvos() {
 		return false;
 	}
 
