@@ -172,13 +172,13 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onMouseUp(double x, double y, int button) {
-		if (lockMouse || LimeDevice.isTvos()) {
+		if (lockMouse) {
 			return;
 		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
 		}
-		addPointer(toLogicalX(x), toLogicalY(y), MOUSE_UP, button);
+		addPointer(toLogicalX(x), toLogicalY(y), LimeDevice.isTvos() ? MOUSE_MOVE : MOUSE_UP, button);
 	}
 
 	private static void lime_onMouseUp0(Pointer p) {
@@ -192,13 +192,13 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onMouseDown(double x, double y, int button) {
-		if (lockMouse || LimeDevice.isTvos()) {
+		if (lockMouse) {
 			return;
 		}
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
 		}
-		addPointer(toLogicalX(x), toLogicalY(y), MOUSE_DOWN, button);
+		addPointer(toLogicalX(x), toLogicalY(y), LimeDevice.isTvos() ? MOUSE_MOVE : MOUSE_DOWN, button);
 	}
 
 	private static void lime_onMouseDown0(Pointer p) {
