@@ -153,6 +153,7 @@ public class LimeInput implements Input {
 		realX /= realWidth;
 		if (LimeDevice.isTvos()) {
 			realX -= 0.5;
+			realX *= 0.5;
 		}
 		return (int) (realX * Gdx.graphics.getWidth());
 	}
@@ -167,6 +168,7 @@ public class LimeInput implements Input {
 		realY /= realHeight;
 		if (LimeDevice.isTvos()) {
 			realY -= 0.5;
+			realY *= 0.5;
 		}
 		return (int) (realY * Gdx.graphics.getHeight());
 	}
@@ -757,8 +759,8 @@ public class LimeInput implements Input {
 		}
 
 		void addXY(double deltaX, double deltaY) {
-			int w = Gdx.graphics.getWidth();
-			int h = Gdx.graphics.getHeight();
+			int w = Gdx.graphics.getWidth() - cursor.getRegionWidth();
+			int h = Gdx.graphics.getHeight() - cursor.getRegionHeight();
 			if (currentX < 0 || currentY < 0) { // Set init values for Apple TV
 				currentX = w * 0.5;
 				currentY = h * 0.5;
