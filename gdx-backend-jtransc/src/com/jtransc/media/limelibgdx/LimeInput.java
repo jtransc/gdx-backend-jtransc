@@ -172,7 +172,7 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onMouseUp(double x, double y, int button) {
-		if (lockMouse) {
+		if (lockMouse || LimeDevice.isTvos()) {
 			return;
 		}
 		if (isLimeInputDebug()) {
@@ -192,7 +192,7 @@ public class LimeInput implements Input {
 	}
 
 	static void lime_onMouseDown(double x, double y, int button) {
-		if (lockMouse) {
+		if (lockMouse || LimeDevice.isTvos()) {
 			return;
 		}
 		if (isLimeInputDebug()) {
@@ -255,6 +255,10 @@ public class LimeInput implements Input {
 
 	private static void lime_onKeyUp0(Pointer p) {
 		int key = p.customData;
+		if (LimeDevice.isTvos() && key == Keys.UNKNOWN) {
+			lime_onMouseUp0(p);
+			return;
+		}
 		keys[key & 0x1FF] = false;
 		justReleased[key & 0x1FF] = true;
 		inputProcessor.keyUp(key);
@@ -269,6 +273,10 @@ public class LimeInput implements Input {
 
 	private static void lime_onKeyDown0(Pointer p) {
 		int key = p.customData;
+		if (LimeDevice.isTvos() && key == Keys.UNKNOWN) {
+			lime_onMouseDown0(p);
+			return;
+		}
 		keys[key & 0x1FF] = true;
 		justPressed[key & 0x1FF] = true;
 		inputProcessor.keyDown(key);
@@ -396,20 +404,21 @@ public class LimeInput implements Input {
 		}
 		if (!lockMouse) {
 			mousePoint.frame();
-			if (LimeDevice.isTvos()) {
-				if (batch == null) {
-					Pixmap circle = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
-					circle.setColor(Color.RED);
-					circle.fill();
-					cursor = new TextureRegion(new Texture(circle), 10, 10);
-					circle.dispose();
-					batch = new SpriteBatch();
-					batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-				}
-				batch.begin();
-				batch.draw(cursor, (float) mousePoint.getX(), (float) (Gdx.graphics.getHeight() - mousePoint.getY()));
-				batch.end();
+		}
+		if (LimeDevice.isTvos()) {
+			if (batch == null) {
+				Pixmap circle = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
+				circle.setColor(Color.RED);
+				circle.fill();
+				cursor = new TextureRegion(new Texture(circle), 10, 10);
+				circle.dispose();
+				batch = new SpriteBatch();
+				batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			}
+			batch.begin();
+			batch.draw(cursor, (float) mousePoint.getX(),
+				(float) (Gdx.graphics.getHeight() - mousePoint.getY() - cursor.getRegionHeight()));
+			batch.end();
 		}
 	}
 
