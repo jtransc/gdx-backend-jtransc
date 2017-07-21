@@ -186,7 +186,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 			@Override
 			public void flush() {
-				System.out.println("GdxPreferencesAdapter.flush();");
 				super.flush();
 			}
 		};
