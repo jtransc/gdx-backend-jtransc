@@ -12,8 +12,8 @@ import java.io.InputStream;
 )
 public class LimeFileInputStream extends InputStream {
 	@HaxeMethodBody(
-		"stat = sys.FileSystem.stat(p0._str);" +
-			"input = sys.io.File.read(p0._str);"
+		"stat = sys.FileSystem.stat(N.i_str(p0));" +
+			"input = sys.io.File.read(N.i_str(p0));"
 	)
 	LimeFileInputStream(String path) {
 	}

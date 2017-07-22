@@ -163,11 +163,11 @@ public class LimeFiles implements Files {
 		private static final int BA_DIRECTORY = 0x04;
 		private static final int BA_HIDDEN = 0x08;
 
-		@HaxeMethodBody("return lime.Assets.exists(p0._str);")
+		@HaxeMethodBody("return lime.Assets.exists(N.i_str(p0));")
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.exists(N.istr(p0));")
 		native private boolean exists(String path);
 
-		@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(p0._str));")
+		@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(N.i_str(p0)));")
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.readBytes(N.istr(p0));")
 		native private byte[] readBytes(String path, int mode);
 	}

@@ -11,7 +11,7 @@ import java.io.OutputStream;
 )
 public class LimeFileOutputStream extends OutputStream {
 	@HaxeMethodBody(
-		"output = p1 ? sys.io.File.append(p0._str) : sys.io.File.write(p0._str);"
+		"output = p1 ? sys.io.File.append(N.i_str(p0)) : sys.io.File.write(N.i_str(p0));"
 	)
 	LimeFileOutputStream(String path, boolean append) {
 	}

@@ -200,24 +200,24 @@ public class LimeFileHandle extends FileHandle {
 		return fileSize(file.getPath());
 	}
 
-	@HaxeMethodBody("sys.FileSystem.deleteFile(p0._str);")
+	@HaxeMethodBody("sys.FileSystem.deleteFile(N.i_str(p0));")
 	private native void delete(String path);
 
-	@HaxeMethodBody("sys.FileSystem.deleteDirectory(p0._str);")
+	@HaxeMethodBody("sys.FileSystem.deleteDirectory(N.i_str(p0));")
 	private native void deleteDirectory(String path);
 
-	@HaxeMethodBody("return sys.FileSystem.exists(p0._str);")
+	@HaxeMethodBody("return sys.FileSystem.exists(N.i_str(p0));")
 	private native boolean exist(String path);
 
-	@HaxeMethodBody("return lime.Assets.exists(p0._str);")
+	@HaxeMethodBody("return lime.Assets.exists(N.i_str(p0));")
 	private native boolean internalExist(String path);
 
-	@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(p0._str));")
+	@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(N.i_str(p0)));")
 	private native byte[] internalRead(String path);
 
-	@HaxeMethodBody("sys.FileSystem.createDirectory(p0._str);")
+	@HaxeMethodBody("sys.FileSystem.createDirectory(N.i_str(p0));")
 	private native void mkdirs(String path);
 
-	@HaxeMethodBody("return sys.FileSystem.stat(p0._str).size;")
+	@HaxeMethodBody("return sys.FileSystem.stat(N.i_str(p0)).size;")
 	private native int fileSize(String path);
 }

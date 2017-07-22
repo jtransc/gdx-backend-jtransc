@@ -16,7 +16,7 @@ class LimeMusic implements Music {
 	private String name;
 	private OnCompletionListener listener;
 
-	@HaxeMethodBody("track = new lime.media.AudioSource(lime.media.AudioBuffer.fromFile(p0._str)); " +
+	@HaxeMethodBody("track = new lime.media.AudioSource(lime.media.AudioBuffer.fromFile(N.i_str(p0))); " +
 		"track.onComplete.add(function():Void { this.{% METHOD com.jtransc.media.limelibgdx.LimeMusic:onComplete %}();});")
 	private native void init0(String path);
 

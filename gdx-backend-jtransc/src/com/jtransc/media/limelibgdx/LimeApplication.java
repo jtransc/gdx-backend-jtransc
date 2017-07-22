@@ -202,7 +202,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 				native public String getContents();
 
 				@Override
-				@HaxeMethodBody("lime.system.Clipboard.text = p0._str;")
+				@HaxeMethodBody("lime.system.Clipboard.text = N.i_str(p0);")
 				native public void setContents(String content);
 			};
 		} else {

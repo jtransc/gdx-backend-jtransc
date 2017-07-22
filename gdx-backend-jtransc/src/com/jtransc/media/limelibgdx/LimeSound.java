@@ -13,7 +13,7 @@ import com.jtransc.annotation.haxe.HaxeImports;
 @HaxeAddMembers({"var track:lime.media.AudioSource;"})
 class LimeSound implements Sound {
 	@HaxeMethodBody(
-		"track = new lime.media.AudioSource(lime.media.AudioBuffer.fromFile(p0._str)); " +
+		"track = new lime.media.AudioSource(lime.media.AudioBuffer.fromFile(N.i_str(p0))); " +
 			"track.onComplete.add(function():Void { " +
 			"track.backend.completed = false; " +
 			"track.currentTime = 0; " +
