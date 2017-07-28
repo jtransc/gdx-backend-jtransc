@@ -10,24 +10,35 @@ import com.jtransc.annotation.haxe.HaxeImports;
 		"@:access(lime.media.AudioSource)"
 )
 
-@HaxeAddMembers({"var track:lime.media.AudioSource;"})
+@HaxeAddMembers({"var tracks:Array<lime.media.AudioSource>;" +
+				 "var buffer:lime.media.AudioBuffer;" +
+				 "private static inline var MAX_INSTANCES = 5;"})
 class LimeSound implements Sound {
+
+	private String name;
+
+
 	@HaxeMethodBody(
-		"track = new lime.media.AudioSource(lime.media.AudioBuffer.fromFile(N.i_str(p0))); " +
-			"track.onComplete.add(function():Void { " +
-			"track.backend.completed = false; " +
-			"track.currentTime = 0; " +
-			"this.{% METHOD com.jtransc.media.limelibgdx.LimeSound:onComplete %}();" +
-			"});"
+			"buffer = lime.media.AudioBuffer.fromBytes(lime.Assets.getBytes(N.i_str(p0)));" +
+			"if (buffer == null) return false;" +
+			"tracks = new Array<lime.media.AudioSource>(); " +
+			"for (i in 0...MAX_INSTANCES) { " +
+				"tracks[i] = new lime.media.AudioSource(buffer); " +
+				"tracks[i].onComplete.add(function():Void { " +
+		  		  "tracks[i].backend.completed = false; " +
+				  "tracks[i].currentTime = 0; " +
+				"});" +
+			"}" +
+			"return true;"
 	)
-	private native void init0(String path);
+	private native boolean init0(String path);
 
 	void init(String path) {
-		init0(path);
-	}
-
-	@SuppressWarnings("unused")
-	void onComplete() {
+		name = path;
+		boolean res = init0(path);
+		if (LimeAudio.isAudioDebug()) {
+			System.out.println("Lime sound loaded: " + name + (res ? " successful" : " failed"));
+		}
 	}
 
 	@Override
@@ -60,17 +71,34 @@ class LimeSound implements Sound {
 		return play(true, volume);
 	}
 
-	@HaxeMethodBody("track.loops = p0 ? 100000 : 0; " +
-		"var vol = p1 < 0 ? track.gain : p1 > 1.0 ? 1.0 : p1; track.gain = vol;" +
-		"track.play(); return 0;")
-	private native long play(boolean loop, float volume);
+	@HaxeMethodBody("if (buffer == null) return -1;" +
+		"for (i in 0...MAX_INSTANCES) { " +
+		 "if (!tracks[i].backend.playing) {" +
+		  "tracks[i].loops = p0 ? 100000 : 0; " +
+		  "var vol = p1 < 0 ? tracks[i].gain : p1 > 1.0 ? 1.0 : p1; tracks[i].gain = vol;" +
+		  "tracks[i].play(); return i;" +
+		"} }" +
+		"return -1;")
+	private native long play0(boolean loop, float volume);
+	private long play(boolean loop, float volume){
+		if (LimeAudio.isAudioDebug()) {
+			System.out.println("Lime sound play: " + name + ", vol: " + volume);
+		}
+		return play0(loop, volume);
+	}
 
 	@Override
-	@HaxeMethodBody("track.stop();")
+	@HaxeMethodBody("if (track.buffer == null) return;" +
+		"for (i in 0...MAX_INSTANCES) { " +
+		  "tracks[i].stop();" +
+		"}")
 	public native void stop();
 
 	@Override
-	@HaxeMethodBody("track.pause();")
+	@HaxeMethodBody("if (track.buffer == null) return;" +
+		"for (i in 0...MAX_INSTANCES) { " +
+		  "tracks[i].pause();" +
+		"}")
 	public native void pause();
 
 	@Override
@@ -79,18 +107,20 @@ class LimeSound implements Sound {
 	}
 
 	@Override
-	@HaxeMethodBody("track.dispose();")
+	@HaxeMethodBody("if (buffer == null) return;" +
+		"buffer = null;" +
+		"for (i in 0...MAX_INSTANCES) { " +
+		  "tracks[i].dispose();" +
+		"}")
 	public native void dispose();
 
 	@Override
-	public void stop(long soundId) {
-		stop();
-	}
+	@HaxeMethodBody("if (p0 >= 0 && p0 < MAX_INSTANCES){ tracks[haxe.Int64.toInt(p0)].stop();}")
+	public native void stop(long soundId);
 
 	@Override
-	public void pause(long soundId) {
-		pause();
-	}
+	@HaxeMethodBody("if (p0 >= 0 && p0 < MAX_INSTANCES){ tracks[haxe.Int64.toInt(p0)].pause();}")
+	public native void pause(long soundId);
 
 	@Override
 	public void resume(long soundId) {
@@ -98,7 +128,7 @@ class LimeSound implements Sound {
 	}
 
 	@Override
-	@HaxeMethodBody("track.loops = p1 ? 100000 : 0;")
+	@HaxeMethodBody("if (p0 >= 0 && p0 < MAX_INSTANCES){ tracks[haxe.Int64.toInt(p0)].loops = p1 ? 100000 : 0;}")
 	public native void setLooping(long soundId, boolean looping);
 
 	@Override
@@ -106,9 +136,12 @@ class LimeSound implements Sound {
 	}
 
 	@Override
-	@HaxeMethodBody("var vol = p1 < 0 ? 0 : p1 > 1.0 ? 1.0 : p1; track.gain = vol;")
-	public void setVolume(long soundId, float volume) {
-	}
+	@HaxeMethodBody("if (buffer == null) return;" +
+		"if (p0 >= 0 && p0 < MAX_INSTANCES) { " +
+		  "var vol = p1 < 0 ? 0 : p1 > 1.0 ? 1.0 : p1; " +
+		  "tracks[haxe.Int64.toInt(p0)].gain = vol;" +
+		"}")
+	public native void setVolume(long soundId, float volume);
 
 	@Override
 	public void setPan(long soundId, float pan, float volume) {
