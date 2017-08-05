@@ -50,7 +50,7 @@ import java.io.IOException;
 	"@limetest.cmd"
 })
 @HaxeAddLibraries({
-	"lime:5.2.1"
+	"lime:5.3.0"
 })
 @HaxeAddAssets({
 	"com/badlogic/gdx/utils/arial-15.fnt",
