@@ -77,6 +77,9 @@
 	<!-- Only ARM64 use for iOS, all devices from iPhone5s -->
 	<architecture name="arm64" if="ios" />
 	<architecture name="arm64" if="tvos" />
+	{% if extra.windows_arch %}
+	<architecture name="{{ extra.windows_arch }}" if="windows" />
+	{% end %}
 
 	{% if extra.androidTargetSdkVersion %}<config:android target-sdk-version="{{ extra.androidTargetSdkVersion }}" />{% end %}
 	{% if extra.androidInstallLocation %}<config:android install-location="{{ extra.androidInstallLocation }}" />{% end %}
