@@ -108,4 +108,6 @@
 			<haxelib name="{{ lib.name }}" />
 		{% end %}
 	{% end %}
+
+	{%if extra.enable-game-center %}<haxelib name="extension-gamecenter" />{% end %}
 </project>
