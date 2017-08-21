@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<meta title="{{ title }}" package="{{ package }}" version="{{ version }}" company="{{ company }}" />
+	<meta title="{{ title }}" package="{{ package }}" version="{{ extra.version }}" company="{{ company }}" />
 	<meta title="*{{ title }}" if="debug" />
 	<app main="{{ entryPointClass }}" path="out" file="{{ name }}" />
 	<app swf-version="11.8" />
@@ -108,6 +108,7 @@
 			<haxelib name="{{ lib.name }}" />
 		{% end %}
 	{% end %}
+	<define name="lime" />
 
 	{%if extra.enable-game-center %}<haxelib name="extension-gamecenter" />{% end %}
 </project>
