@@ -11,10 +11,10 @@ public class GdxGamecenter {
 	@HaxeMethodBody(target = "cpp", value = "extension.gamecenter.GameCenter.authenticate();")
 	public native static void login();
 
-	@HaxeMethodBody(target = "cpp", value = "return extension.gamecenter.GameCenter.getPlayerName();")
+	@HaxeMethodBody(target = "cpp", value = "return N.str(extension.gamecenter.GameCenter.getPlayerName());")
 	public native static String getPlayerName();
 
-	@HaxeMethodBody(target = "cpp", value = "return extension.gamecenter.GameCenter.getPlayerID();")
+	@HaxeMethodBody(target = "cpp", value = "return N.str(extension.gamecenter.GameCenter.getPlayerID());")
 	public native static String getPlayerID();
 
 	@HaxeMethodBody(target = "cpp", value = "extension.gamecenter.GameCenter.getPlayerPhoto(N.i_str(p0));")
