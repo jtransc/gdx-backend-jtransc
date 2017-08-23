@@ -562,8 +562,11 @@ public class Pixmap implements Disposable {
 
 	private void rectangle(int x, int y, int width, int height, DrawType drawType) {
 		if (format == Format.RGBA8888) {
+			if (x < 0 || y < 0 || x + width > this.width || y + height > this.height) {
+				throw new IllegalArgumentException();
+			}
 			if (drawType == DrawType.FILL) {
-				int start = (y * width + x) << 2;
+				int start = (y * this.width + x) << 2;
 				// first pixel
 				byteData[start] = (byte) ((color >> 24) & 0xFF);
 				byteData[start + 1] = (byte) ((color >> 16) & 0xFF);
@@ -576,7 +579,7 @@ public class Pixmap implements Disposable {
 				}
 				// rest rows
 				for (int n = 1; n < height; n++) {
-					System.arraycopy(byteData, start, byteData, start + ((width * n) << 2), width << 2);
+					System.arraycopy(byteData, start, byteData, start + ((this.width * n) << 2), width << 2);
 				}
 				return;
 			}
