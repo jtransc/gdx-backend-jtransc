@@ -563,15 +563,17 @@ public class Pixmap implements Disposable {
 	private void rectangle(int x, int y, int width, int height, DrawType drawType) {
 		if (format == Format.RGBA8888) {
 			if (drawType == DrawType.FILL) {
-				int widthInBytes = this.width << 2;
-				byte[] byteColor = new byte[]{(byte) ((color >> 24) & 0xFF), (byte) ((color >> 16) & 0xFF), (byte) ((color >> 8) & 0xFF), (byte) (color & 0xFF)};
-				int offset = x << 2;
-				for (int i = 0; i < widthInBytes; i++) {
-					System.arraycopy(byteColor, 0, byteData, offset, 4);
-					offset += 4;
-				}
-				for (int i = y << 2; i < height << 2; i++) {
-					System.arraycopy(byteData, x << 2, byteData, i * widthInBytes + (x << 2), widthInBytes);
+				int start = (y * width + x) << 2;
+				// first pixel
+				byteData[start] = (byte) ((color >> 24) & 0xFF);
+				byteData[start + 1] = (byte) ((color >> 16) & 0xFF);
+				byteData[start + 2] = (byte) ((color >> 8) & 0xFF);
+				byteData[start + 3] = (byte) (color & 0xFF);
+				// first row (overlapping with just one high level operation, optimized with a memmove)
+				System.arraycopy(byteData, start, byteData, start + 4, (width - 1) << 2);
+				// rest rows
+				for (int n = 1; n <= height; n++) {
+					System.arraycopy(byteData, start, byteData, start + ((width * n) << 2), width << 2);
 				}
 				return;
 			}
