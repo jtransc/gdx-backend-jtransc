@@ -1,9 +1,38 @@
 package com.badlogic.gdx.social;
 
-
+import com.jtransc.annotation.haxe.HaxeAddFilesTemplate;
+import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 
+@HaxeAddFilesTemplate({
+	"GCListener.hx"
+})
+
+@HaxeAddMembers({"static var listener:GCListener;"})
 public class GdxGamecenter {
+
+	public static final String DISABLED = "disabled";
+	public static final String AUTH_SUCCESS = "authSuccess";
+	public static final String AUTH_ALREADY = "authAlready";
+	public static final String AUTH_FAILURE = "authFailure";
+	public static final String SCORE_SUCCESS = "scoreSuccess";
+	public static final String SCORE_FAILURE = "scoreFailure";
+	public static final String ACHIEVEMENT_SUCCESS = "achievementSuccess";
+	public static final String ACHIEVEMENT_FAILURE = "achievementFailure";
+	public static final String ACHIEVEMENT_RESET_SUCCESS = "achievementResetSuccess";
+	public static final String ACHIEVEMENT_RESET_FAILURE = "achievementResetFailure";
+
+	public static final String ON_GET_ACHIEVEMENT_STATUS_FAILURE = "onGetAchievementStatusFailure";
+	public static final String ON_GET_ACHIEVEMENT_STATUS_SUCCESS = "onGetAchievementStatusSuccess";
+	public static final String ON_GET_ACHIEVEMENT_PROGRESS_FAILURE = "onGetAchievementProgressFailure";
+	public static final String ON_GET_ACHIEVEMENT_PROGRESS_SUCCESS = "onGetAchievementProgressSuccess";
+	public static final String ON_GET_PLAYER_SCORE_FAILURE = "onGetPlayerScoreFailure";
+	public static final String ON_GET_PLAYER_SCORE_SUCCESS = "onGetPlayerScoreSuccess";
+
+	public static final String ON_GET_PLAYER_FRIENDS_FAILURE = "onGetPlayerFriendsFailure";
+	public static final String ON_GET_PLAYER_FRIENDS_SUCCESS = "onGetPlayerFriendsSuccess";
+	public static final String ON_GET_PLAYER_PHOTO_FAILURE = "onGetPlayerPhotoFailure";
+	public static final String ON_GET_PLAYER_PHOTO_SUCCESS = "onGetPlayerPhotoSuccess";
 
 	@HaxeMethodBody(target = "cpp", value = "return extension.gamecenter.GameCenter.available;")
 	public native static boolean isAvailable();
@@ -50,13 +79,14 @@ public class GdxGamecenter {
 	@HaxeMethodBody(target = "cpp", value = "extension.gamecenter.GameCenter.getPlayerScore(N.i_str(p0));")
 	public native static void getPlayerScore(String id);
 
+	@HaxeMethodBody(target = "cpp", value =
+		"if (listener == null) listener = new GCListener();" +
+		"listener.setHandler(p0);" +
+		"extension.gamecenter.GameCenter.setEventListener(listener);")
+	public static void setListener(GCListener listener){
+	}
 
-
-	// @TODO: replace openfl to lime only classes
-	//public static setListener(GCListener listener);
-	//public static removeListener();
-
-	interface GCListener {
-		void onEvent(String type, String d1, String d2, String d3, String d4);
+	@HaxeMethodBody(target = "cpp", value = "if (listener != null) listener.dispose();")
+	public static void removeListener(){
 	}
 }
