@@ -572,7 +572,7 @@ public class Pixmap implements Disposable {
 				// first row (overlapping with just one high level operation, optimized with a memmove)
 //				System.arraycopy(byteData, start, byteData, start + 4, (width - 1) << 2);
 				for (int i = 1; i < width; i++) {
-					System.arraycopy(byteData, 0, byteData, start + (i << 2), 4);
+					System.arraycopy(byteData, start, byteData, start + (i << 2), 4);
 				}
 				// rest rows
 				for (int n = 1; n < height; n++) {
