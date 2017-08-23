@@ -565,18 +565,17 @@ public class Pixmap implements Disposable {
 			if (drawType == DrawType.FILL) {
 				int widthInBytes = this.width << 2;
 				byte[] byteColor = new byte[]{(byte) ((color >> 24) & 0xFF), (byte) ((color >> 16) & 0xFF), (byte) ((color >> 8) & 0xFF), (byte) (color & 0xFF)};
-
-				for (int i = 0; i < height; ++i) {
-					int offset = (y + i) * widthInBytes + (x << 2);
-					for (int j = 0; j < width; ++j) {
-						System.arraycopy(byteColor, 0, byteData, offset, 4);
-						offset += 4;
-					}
+				int offset = x << 2;
+				for (int i = 0; i < widthInBytes; i++) {
+					System.arraycopy(byteColor, 0, byteData, offset, 4);
+					offset += 4;
+				}
+				for (int i = y << 2; i < height << 2; i++) {
+					System.arraycopy(byteData, x << 2, byteData, i * widthInBytes + (x << 2), widthInBytes);
 				}
 				return;
 			}
 		}
-
 		System.out.println("NOT IMPLEMENTED: Pixmap.rectangle(" + x + ", " + y + ", " + width + ", " + height + ", " + drawType + ") format: " + format);
 	}
 
