@@ -560,7 +560,31 @@ public class Pixmap implements Disposable {
 
 	native private void line(int x, int y, int x2, int y2, DrawType drawType);
 
-	native private void rectangle(int x, int y, int width, int height, DrawType drawType);
+	private void rectangle(int x, int y, int width, int height, DrawType drawType) {
+		if (format == Format.RGBA8888) {
+			if (x < 0 || y < 0 || x + width > this.width || y + height > this.height) {
+				throw new IllegalArgumentException();
+			}
+			if (drawType == DrawType.FILL) {
+				int start = (y * this.width + x) << 2;
+				// first pixel
+				byteData[start] = (byte) ((color >> 24) & 0xFF);
+				byteData[start + 1] = (byte) ((color >> 16) & 0xFF);
+				byteData[start + 2] = (byte) ((color >> 8) & 0xFF);
+				byteData[start + 3] = (byte) (color & 0xFF);
+				// first row
+				for (int i = 1; i < width; i++) {
+					System.arraycopy(byteData, start, byteData, start + (i << 2), 4);
+				}
+				// rest rows
+				for (int n = 1; n < height; n++) {
+					System.arraycopy(byteData, start, byteData, start + ((this.width * n) << 2), width << 2);
+				}
+				return;
+			}
+		}
+		System.out.println("NOT IMPLEMENTED: Pixmap.rectangle(" + x + ", " + y + ", " + width + ", " + height + ", " + drawType + ") format: " + format);
+	}
 
 	native private void triangle(int x1, int y1, int x2, int y2, int x3, int y3, DrawType drawType);
 
