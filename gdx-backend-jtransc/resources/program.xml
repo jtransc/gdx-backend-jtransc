@@ -110,5 +110,5 @@
 	{% end %}
 	<define name="lime" />
 
-	{%if extra.enable_game_center %}<haxelib name="extension-gamecenter" />{% end %}
+	{%if extra.enable_game_center %}<haxelib name="jtransc-game-center" />{% end %}
 </project>

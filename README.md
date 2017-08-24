@@ -44,7 +44,7 @@ Also will support the JVM version jtransc support, so when supported 1.8, it wil
 
 RoboVM was the ideal option here. But it was closed. So this is an option that also works for other targets.
 
-For use game center install `haxelib install extension-gamecenter` and set in project gradle `param("enable_game_center", "true")`
+For use game center install `haxelib install jtransc-game-center` and set in project gradle `param("enable_game_center", "true")`
 
 ### BlackBerry and WebOS (C++)
 
