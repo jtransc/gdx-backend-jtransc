@@ -572,8 +572,7 @@ public class Pixmap implements Disposable {
 				byteData[start + 1] = (byte) ((color >> 16) & 0xFF);
 				byteData[start + 2] = (byte) ((color >> 8) & 0xFF);
 				byteData[start + 3] = (byte) (color & 0xFF);
-				// first row (overlapping with just one high level operation, optimized with a memmove)
-//				System.arraycopy(byteData, start, byteData, start + 4, (width - 1) << 2);
+				// first row
 				for (int i = 1; i < width; i++) {
 					System.arraycopy(byteData, start, byteData, start + (i << 2), 4);
 				}
