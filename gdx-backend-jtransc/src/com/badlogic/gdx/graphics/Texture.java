@@ -117,7 +117,11 @@ public class Texture extends GLTexture {
 	}
 
 	public Texture (TextureData data) {
-		super(GL20.GL_TEXTURE_2D, Gdx.gl.glGenTexture());
+		this(GL20.GL_TEXTURE_2D, Gdx.gl.glGenTexture(), data);
+	}
+
+	protected Texture (int glTarget, int glHandle, TextureData data) {
+		super(glTarget, glHandle);
 		load(data);
 		if (data.isManaged()) addManagedTexture(Gdx.app, this);
 	}
