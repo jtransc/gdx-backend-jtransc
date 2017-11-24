@@ -125,7 +125,7 @@ class LimeMusic implements Music {
 	public native void setVolume(float volume);
 
 	@Override
-	@HaxeMethodBody("if (track.buffer == null) return 0; +" +
+	@HaxeMethodBody("if (track.buffer == null) return 0; " +
 		"return track.gain;")
 	public native float getVolume();
 
