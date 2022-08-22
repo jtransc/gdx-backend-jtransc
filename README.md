@@ -18,7 +18,7 @@ Examples and demos:
 
 ### JavaScript (JS)
 
-JavaScript target allows to target JavaScript+WebGL. Projects that already do this:
+JavaScript target allows for targeting of JavaScript+WebGL. Projects that already do this:
 [GWT](http://www.gwtproject.org/) and [TeaVM](https://github.com/konsoletyper/teavm).
 * GWT is source to source Java 7 and doesn't provide reflection. So can't use Kotlin or Scala or libraries without source.
 * TeaVM is pretty cool. It is bytecode based as jtransc, and has great performance. Reflection is not supported directly, but with metaprogramming.
@@ -26,10 +26,10 @@ JavaScript target allows to target JavaScript+WebGL. Projects that already do th
 ### Flash (SWF)
 
 [Flash support is in the works](https://github.com/jtransc/gdx-backend-jtransc/issues/3). It includes a pure java GLSL compiler that generates AGAL bytecode. And there is a StateGL adaptor that simplifies the API and allows to emit Stage3D commands.
-As far as I know this is the only option you have to target java/kotlin to flash.
-Flash target allows to provide an option for people using older browsers.
-Also Adobe AIR allows to generate both: Android and iOS executables in a windows machine, and without specific SDKs.
-So you can target to flash, and then go to Adobe AIR targets.
+As far as I know this is the only option you have to target java/kotlin on flash.
+Flash targets can provide an option for people using older browsers.
+Also Adobe AIR allows for generation of both Android and iOS executables in a Windows machine, and without specific SDKs.
+So you can target Flash, and then go to Adobe AIR targets.
 
 ### Desktop (C++): iOS/Windows/Linux
 
@@ -37,8 +37,8 @@ It is possible to generate native executables for desktop platforms using C++. M
 
 ### Android (C++)
 
-Even when Android supports Java natively. You don't know where it is going to be executed: Dalvik or ART. So the optimizations are not predictable. C++ allows to generate native code whith predictable performance. Also this versions totally ignores the method cound problem. So you can all all the classes and methods you need.
-Also will support the JVM version jtransc support, so when supported 1.8, it will support that version on all android devices including older ones.
+Even though Android supports Java natively, you don't know where it is going to be executed: Dalvik or ART. So the optimizations are not predictable. C++ allows generation of native code with predictable performance. Also this versions totally ignores the method count problem. So you can add all the classes and methods you need.
+Also will support the JVM version jtransc support, so when supported in 1.8, it will support that version on all android devices including older ones.
 
 ### iOS (C++)
 
@@ -48,10 +48,10 @@ For use game center install `haxelib install jtransc-game-center` and set in pro
 
 ### BlackBerry and WebOS (C++)
 
-JTransc using lime is capable of target these too.
+JTransc using lime is capable of targeting these too.
 
 ### Other future targets (C++/C#) (Unity, Windows Phone, Consoles: PS4, XboxOne...)
 
-Since it already includes code for simplifying opengl and parting GlSL code this is pretty portable.
+Since it already includes code for simplifying OpenGL and creating GlSL code this is pretty portable.
 Right now we are using Lime that could support other targets.
 But we could also target to [Kha](http://kha.tech/) that already targets unity, playstation and xbox.
